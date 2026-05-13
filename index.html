@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AXIS FOCUS — Недельный планер в Google Sheets</title>
+<meta name="description" content="Система недельного планирования в Google Sheets. Трекер привычек, аналитика, дневник — всё в одном месте. Без подписок, навсегда.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Unbounded:wght@300;400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0e0e0e;
+    --white: #f5f3ee;
+    --cream: #ede9e1;
+    --accent: #2a2a2a;
+    --muted: #888580;
+    --purple: #4a3f6b;
+    --purple-light: #ece9f4;
+    --border: rgba(0,0,0,0.1);
+    --font-display: 'Unbounded', sans-serif;
+    --font-serif: 'Cormorant Garamond', serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--white);
+    color: var(--black);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(245,243,238,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    color: var(--black);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--purple); }
+  .nav-cta {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--white);
+    background: var(--black);
+    padding: 10px 24px;
+    border-radius: 2px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--purple); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 120px 48px 80px;
+    gap: 64px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(74,63,107,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-label {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-label::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 1px;
+    background: var(--purple);
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+  }
+  .hero-title em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 300;
+    color: var(--purple);
+  }
+  .hero-sub {
+    font-size: 17px;
+    font-weight: 300;
+    color: #444;
+    line-height: 1.8;
+    margin-bottom: 48px;
+    max-width: 440px;
+  }
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--white);
+    background: var(--black);
+    padding: 16px 36px;
+    border-radius: 2px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--purple); transform: translateY(-1px); }
+  .hero-price {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .hero-price strong {
+    font-size: 20px;
+    color: var(--black);
+    font-weight: 500;
+  }
+  .hero-visual {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero-mockup {
+    width: 100%;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 32px;
+    position: relative;
+  }
+  .mockup-header {
+    font-family: var(--font-display);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+  .mockup-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  .mockup-day {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 8px 6px;
+    text-align: center;
+  }
+  .mockup-day-name {
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .mockup-progress {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 500;
+  }
+  .p-high { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #a5d6a7; }
+  .p-mid  { background: #fff8e1; color: #f57f17; border: 1.5px solid #ffe082; }
+  .p-low  { background: #fce4ec; color: #c62828; border: 1.5px solid #f48fb1; }
+  .mockup-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .mockup-stat {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 10px;
+  }
+  .mockup-stat-val {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--black);
+  }
+  .mockup-stat-label {
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* SECTION BASE */
+  section { padding: 100px 48px; }
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 1px;
+    background: var(--purple);
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .section-title em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--purple);
+  }
+
+  /* PROBLEM */
+  .problem { background: var(--black); color: var(--white); }
+  .problem .section-label { color: rgba(255,255,255,0.4); }
+  .problem .section-label::before { background: rgba(255,255,255,0.4); }
+  .problem .section-title { color: var(--white); }
+  .problem .section-title em { color: #b8a9d9; }
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+    margin-top: 64px;
+  }
+  .problem-list { list-style: none; }
+  .problem-list li {
+    display: flex;
+    gap: 20px;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 16px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.6;
+  }
+  .problem-list li:first-child { border-top: 1px solid rgba(255,255,255,0.08); }
+  .problem-num {
+    font-family: var(--font-display);
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.1em;
+    padding-top: 3px;
+    flex-shrink: 0;
+  }
+  .problem-quote {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 40px;
+  }
+  .problem-quote-text {
+    font-family: var(--font-serif);
+    font-size: 28px;
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 24px;
+  }
+  .problem-quote-author {
+    font-size: 13px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.1em;
+  }
+
+  /* FEATURES */
+  .features-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: end;
+    margin-bottom: 64px;
+  }
+  .features-desc {
+    font-size: 17px;
+    font-weight: 300;
+    color: #555;
+    line-height: 1.8;
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .feature-card {
+    background: var(--white);
+    padding: 36px 32px;
+    transition: background 0.2s;
+  }
+  .feature-card:hover { background: var(--cream); }
+  .feature-icon {
+    width: 40px; height: 40px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 18px;
+  }
+  .feature-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+  .feature-desc {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* AUTHOR */
+  .author { background: var(--cream); }
+  .author-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    margin-top: 48px;
+  }
+  .author-photo {
+    aspect-ratio: 3/4;
+    background: var(--border);
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    border: 1px solid rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+  }
+  .author-photo::after {
+    content: 'фото автора';
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .author-text {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.7;
+    color: #333;
+    margin-bottom: 32px;
+  }
+  .author-name {
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* REVIEWS */
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 64px;
+  }
+  .review-card {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 32px;
+  }
+  .review-stars {
+    color: var(--purple);
+    font-size: 14px;
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+  }
+  .review-text {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  .review-author {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* PRICING */
+  .pricing { background: var(--black); color: var(--white); }
+  .pricing .section-label { color: rgba(255,255,255,0.4); }
+  .pricing .section-label::before { background: rgba(255,255,255,0.4); }
+  .pricing .section-title { color: var(--white); }
+  .pricing-card {
+    max-width: 560px;
+    margin: 64px auto 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 4px;
+    padding: 56px;
+    text-align: center;
+  }
+  .pricing-badge {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--purple);
+    background: rgba(74,63,107,0.2);
+    border: 1px solid rgba(74,63,107,0.4);
+    padding: 6px 16px;
+    border-radius: 2px;
+    margin-bottom: 32px;
+  }
+  .pricing-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .pricing-price {
+    font-family: var(--font-display);
+    font-size: 72px;
+    font-weight: 300;
+    color: var(--white);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .pricing-price span {
+    font-size: 24px;
+    font-weight: 300;
+    vertical-align: top;
+    margin-top: 12px;
+    display: inline-block;
+  }
+  .pricing-once {
+    font-size: 13px;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 40px;
+    letter-spacing: 0.08em;
+  }
+  .pricing-features {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 40px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 24px 0;
+  }
+  .pricing-features li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    font-size: 15px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.75);
+  }
+  .pricing-features li::before {
+    content: '✦';
+    color: var(--purple);
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+  .btn-buy {
+    display: block;
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--black);
+    background: var(--white);
+    padding: 18px 36px;
+    border-radius: 2px;
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-buy:hover { background: var(--purple); color: var(--white); }
+  .pricing-note {
+    margin-top: 20px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.3);
+    line-height: 1.6;
+  }
+
+  /* FAQ */
+  .faq-list { margin-top: 64px; max-width: 720px; margin-left: auto; margin-right: auto; }
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+  }
+  .faq-q {
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--black);
+    cursor: pointer;
+    gap: 16px;
+  }
+  .faq-q:hover { color: var(--purple); }
+  .faq-arrow {
+    font-size: 18px;
+    transition: transform 0.3s;
+    flex-shrink: 0;
+    color: var(--muted);
+  }
+  .faq-item.open .faq-arrow { transform: rotate(45deg); color: var(--purple); }
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+  .faq-a-inner { padding-bottom: 24px; }
+  .faq-item.open .faq-a { max-height: 200px; }
+
+  /* FOOTER */
+  footer {
+    background: var(--cream);
+    border-top: 1px solid var(--border);
+    padding: 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    color: var(--black);
+  }
+  .footer-logo span { color: var(--purple); }
+  .footer-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .footer-links a {
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .footer-links a:hover { color: var(--black); }
+  .footer-inn {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ANIMATIONS */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .hero { grid-template-columns: 1fr; padding: 100px 24px 60px; gap: 48px; }
+    .hero-visual { order: -1; }
+    section { padding: 72px 24px; }
+    .problem-grid,
+    .features-intro,
+    .author-grid,
+    .reviews-grid { grid-template-columns: 1fr; gap: 40px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .pricing-card { padding: 36px 24px; }
+    footer { flex-direction: column; align-items: flex-start; padding: 36px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">AXIS <span>FOCUS</span></a>
+  <a href="#pricing" class="nav-cta">Получить планер</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content fade-in">
+    <p class="hero-label">Google Sheets · Один платёж · Навсегда</p>
+    <h1 class="hero-title">Порядок<br>в голове<br>начинается<br>с <em>системы</em></h1>
+    <p class="hero-sub">Недельный планер с аналитикой, трекером привычек и дневником. Работает в Google Sheets — на телефоне, планшете и компьютере.</p>
+    <div class="hero-actions">
+      <a href="#pricing" class="btn-primary">Получить за 790 ₽</a>
+      <div class="hero-price">один платёж —<br><strong>навсегда</strong></div>
+    </div>
+  </div>
+  <div class="hero-visual fade-in" style="transition-delay:0.15s">
+    <div class="hero-mockup">
+      <div class="mockup-header">AXIS FOCUS · Апрель · неделя 17</div>
+      <div class="mockup-week">
+        <div class="mockup-day"><div class="mockup-day-name">Пн</div><div class="mockup-progress p-high">100%</div></div>
+        <div class="mockup-day"><div class="mockup-day-name">Вт</div><div class="mockup-progress p-mid">67%</div></div>
+        <div class="mockup-day"><div class="mockup-day-name">Ср</div><div class="mockup-progress p-high">83%</div></div>
+        <div class="mockup-day"><div class="mockup-day-name">Чт</div><div class="mockup-progress p-mid">50%</div></div>
+        <div class="mockup-day"><div class="mockup-day-name">Пт</div><div class="mockup-progress p-high">75%</div></div>
+        <div class="mockup-day"><div class="mockup-day-name">Сб</div><div class="mockup-progress p-low">33%</div></div>
+        <div class="mockup-day"><div class="mockup-day-name">Вс</div><div class="mockup-progress p-mid">60%</div></div>
+      </div>
+      <div class="mockup-stats">
+        <div class="mockup-stat"><div class="mockup-stat-val">73%</div><div class="mockup-stat-label">прогресс</div></div>
+        <div class="mockup-stat"><div class="mockup-stat-val">СР</div><div class="mockup-stat-label">лучший день</div></div>
+        <div class="mockup-stat"><div class="mockup-stat-val">3/3</div><div class="mockup-stat-label">цели недели</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="section-label">узнаёшь себя?</div>
+  <h2 class="section-title">Когда задачи<br>везде — их <em>нигде нет</em></h2>
+  <div class="problem-grid">
+    <ul class="problem-list fade-in">
+      <li><span class="problem-num">01</span>Заметки в телефоне, задачи в голове, напоминания в мессенджере — всё разрозненно</li>
+      <li><span class="problem-num">02</span>День заканчивается, а ощущение что ничего не сделал — хотя работал весь день</li>
+      <li><span class="problem-num">03</span>Привычки начинаются и бросаются. Нет системы — нет прогресса</li>
+      <li><span class="problem-num">04</span>Тревожность растёт когда не понимаешь, куда уходит время и энергия</li>
+    </ul>
+    <div class="problem-quote fade-in" style="transition-delay:0.15s">
+      <p class="problem-quote-text">«Я не искал ещё одно приложение. Я искал систему — ту, которая всегда под рукой и не исчезает после обновления телефона.»</p>
+      <p class="problem-quote-author">— автор AXIS FOCUS</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="features-intro">
+    <div>
+      <div class="section-label">что внутри</div>
+      <h2 class="section-title">Всё что нужно —<br>в <em>одном листе</em></h2>
+    </div>
+    <p class="features-desc">AXIS FOCUS — это не просто таблица. Это система, которая видит твою неделю целиком: что запланировал, что сделал, как себя чувствовал и куда двигаться дальше.</p>
+  </div>
+  <div class="features-grid fade-in">
+    <div class="feature-card">
+      <div class="feature-icon">📅</div>
+      <div class="feature-title">Недельный планер</div>
+      <p class="feature-desc">7 дней, задачи по приоритетам, заметки к каждому дню. Всё на одном экране — без переключений.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">Аналитика недели</div>
+      <p class="feature-desc">Средний прогресс, лучший день, выполнено целей. График выполнено vs запланировано — видишь динамику.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✅</div>
+      <div class="feature-title">Трекер привычек</div>
+      <p class="feature-desc">Отмечаешь привычки по дням, видишь процент выполнения. Прогресс мотивирует продолжать.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🌙</div>
+      <div class="feature-title">Сон · Энергия · Настроение</div>
+      <p class="feature-desc">Фиксируешь состояние каждый день. Система анализирует и даёт текстовый вывод — видишь паттерны.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📓</div>
+      <div class="feature-title">Дневник</div>
+      <p class="feature-desc">Урок дня, благодарность, мысли. Три вопроса — три минуты. Структурируют день и снижают тревожность.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <div class="feature-title">Цели недели</div>
+      <p class="feature-desc">Три главные цели на неделю с отметкой выполнения. Фокус на важном, а не на срочном.</p>
+    </div>
+  </div>
+</section>
+
+<!-- AUTHOR -->
+<section class="author">
+  <div class="section-label">об авторе</div>
+  <h2 class="section-title">Создано из <em>личной необходимости</em></h2>
+  <div class="author-grid">
+    <div class="author-photo fade-in"></div>
+    <div class="fade-in" style="transition-delay:0.15s">
+      <p class="author-text">«Когда есть структура снаружи — меньше шума внутри. Порядок в пространстве рождает порядок в голове. А порядок в голове меняет то, как проживаешь каждый день.<br><br>AXIS FOCUS — это система, которую я создал для себя. И которая изменила то, как я планирую, чувствую и двигаюсь вперёд.»</p>
+      <p class="author-name">Автор · AXIS FOCUS</p>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews">
+  <div class="section-label">отзывы</div>
+  <h2 class="section-title">Что говорят<br>те, кто <em>уже использует</em></h2>
+  <div class="reviews-grid fade-in">
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">«Наконец система, которая не требует отдельного приложения. Google Sheets всегда открыт — планер всегда под рукой.»</p>
+      <p class="review-author">Анна, маркетолог</p>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">«Аналитика по дням — это то чего не хватало во всех других планерах. Теперь вижу, в какие дни у меня реально получается.»</p>
+      <p class="review-author">Максим, фриланс</p>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">«Дневник благодарности прямо в планере — неожиданно сильная вещь. Три минуты вечером меняют восприятие всего дня.»</p>
+      <p class="review-author">Екатерина, предприниматель</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-label">получить доступ</div>
+  <h2 class="section-title" style="color:var(--white)">Один платёж.<br><em style="color:#b8a9d9">Навсегда ваш.</em></h2>
+  <div class="pricing-card fade-in">
+    <div class="pricing-badge">✦ AXIS FOCUS</div>
+    <div class="pricing-name">Недельный планер</div>
+    <div class="pricing-price"><span>₽</span>790</div>
+    <div class="pricing-once">разовый платёж · без подписки</div>
+    <ul class="pricing-features">
+      <li>Недельный планер с задачами и заметками</li>
+      <li>Аналитика: прогресс, лучший день, график</li>
+      <li>Трекер привычек с % выполнения</li>
+      <li>Мониторинг сна, энергии и настроения</li>
+      <li>Дневник: урок, благодарность, мысли</li>
+      <li>Работает на телефоне, планшете, ноутбуке</li>
+      <li>Мгновенная доставка на email</li>
+    </ul>
+    <a href="#" class="btn-buy">Получить AXIS FOCUS</a>
+    <p class="pricing-note">После оплаты вы получите PDF с инструкцией и ссылкой на таблицу.<br>Просто создайте копию в один клик — и начинайте.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="section-label">вопросы</div>
+  <h2 class="section-title" style="text-align:center">Часто<br><em>спрашивают</em></h2>
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-q">Нужен ли Google аккаунт? <span class="faq-arrow">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Да, нужен бесплатный аккаунт Google. Google Sheets — бесплатный сервис, он есть у большинства. Если нет — регистрация занимает 2 минуты.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Как я получу планер после оплаты? <span class="faq-arrow">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Сразу после оплаты на email придёт PDF с инструкцией и ссылкой. Вы нажимаете «Создать копию» — таблица появляется в вашем Google Drive. Весь процесс занимает меньше минуты.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Работает ли на телефоне? <span class="faq-arrow">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Да. Google Sheets имеет приложение для iOS и Android. Планер оптимизирован для работы на всех устройствах — вносите задачи с телефона, анализируйте с ноутбука.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Это разовый платёж или подписка? <span class="faq-arrow">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Разовый платёж навсегда. Никаких подписок, скрытых списаний или ограничений по времени. Оплатили один раз — пользуетесь всегда.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Что если у меня возникнут вопросы? <span class="faq-arrow">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">В PDF есть подробная инструкция по началу работы. Если останутся вопросы — напишите нам, ответим в течение дня.</div></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q">Могу ли я адаптировать планер под себя? <span class="faq-arrow">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Да. Таблица становится вашей копией — вы можете добавлять свои задачи, менять названия привычек, настраивать под свой ритм жизни.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">AXIS <span>FOCUS</span></div>
+  <ul class="footer-links">
+    <li><a href="#">Публичная оферта</a></li>
+    <li><a href="#">Политика конфиденциальности</a></li>
+    <li><a href="#">Контакты</a></li>
+  </ul>
+  <div class="footer-inn">Самозанятый · ИНН: XXXXXXXXXXXX</div>
+</footer>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement;
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  // Fade in on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
