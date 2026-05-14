@@ -3,858 +3,730 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AXIS FOCUS — Недельный планер в Google Sheets</title>
-<meta name="description" content="Система недельного планирования в Google Sheets. Трекер привычек, аналитика, дневник — всё в одном месте. Без подписок, навсегда.">
+<title>AXIS FOCUS — Живи осознанно</title>
+<meta name="description" content="Не просто планер. Система которая помнит твою жизнь, считает прогресс и показывает куда ты движешься. Google Sheets, один платёж, навсегда.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Unbounded:wght@300;400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Geologica:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#0e0e0e;
+  --cream:#f0f0eb;
+  --cream-dark:#e3dfd8;
+  --sand:#5c5240;
+  --gold:#c9b99a;
+  --gold-light:#e8ddd0;
+  --white:#fafaf8;
+  --muted:#8a7f74;
+  --border:rgba(92,82,64,0.15);
+  --f-display:'Playfair Display',serif;
+  --f-body:'Geologica',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--cream);color:var(--black);font-family:var(--f-body);font-size:16px;line-height:1.7;overflow-x:hidden}
 
-  :root {
-    --black: #0e0e0e;
-    --white: #f5f3ee;
-    --cream: #ede9e1;
-    --accent: #2a2a2a;
-    --muted: #888580;
-    --purple: #4a3f6b;
-    --purple-light: #ece9f4;
-    --border: rgba(0,0,0,0.1);
-    --font-display: 'Unbounded', sans-serif;
-    --font-serif: 'Cormorant Garamond', serif;
-    --font-body: 'Inter', sans-serif;
-  }
+/* CURSOR */
+body{cursor:none}
+.cursor{position:fixed;width:8px;height:8px;background:var(--black);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform 0.1s,background 0.2s}
+.cursor-ring{position:fixed;width:32px;height:32px;border:1px solid var(--sand);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all 0.15s ease}
+.cursor-ring.expand{transform:translate(-50%,-50%) scale(2.5);opacity:0.4}
+@media(hover:none){.cursor,.cursor-ring{display:none}body{cursor:auto}}
 
-  html { scroll-behavior: smooth; }
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 56px;display:flex;justify-content:space-between;align-items:center;mix-blend-mode:normal}
+nav::before{content:'';position:absolute;inset:0;background:rgba(240,240,235,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:var(--f-body);font-size:12px;font-weight:500;letter-spacing:0.2em;color:var(--black);text-decoration:none;position:relative;z-index:1}
+.nav-logo span{color:var(--sand)}
+.nav-links{display:flex;gap:32px;align-items:center;position:relative;z-index:1}
+.nav-links a{font-size:13px;color:var(--muted);text-decoration:none;letter-spacing:0.05em;transition:color 0.2s}
+.nav-links a:hover{color:var(--black)}
+.nav-buy{font-size:13px;font-weight:500;color:var(--cream);background:var(--black);padding:10px 24px;border-radius:2px;text-decoration:none;letter-spacing:0.05em;transition:background 0.2s}
+.nav-buy:hover{background:var(--sand);color:var(--cream)}
 
-  body {
-    background: var(--white);
-    color: var(--black);
-    font-family: var(--font-body);
-    font-size: 16px;
-    line-height: 1.7;
-    overflow-x: hidden;
-  }
+/* HERO */
+.hero{min-height:100vh;background:var(--black);display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:120px 56px 80px;gap:80px;position:relative;overflow:hidden}
+.hero-grain{position:absolute;inset:0;opacity:0.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");background-size:128px;pointer-events:none}
+.hero-line{position:absolute;top:0;bottom:0;left:50%;width:1px;background:linear-gradient(to bottom,transparent,rgba(201,185,154,0.15),transparent);pointer-events:none}
+.hero-tag{font-size:11px;letter-spacing:0.2em;color:var(--gold);text-transform:uppercase;margin-bottom:28px;display:flex;align-items:center;gap:12px}
+.hero-tag::before{content:'';width:32px;height:1px;background:var(--gold);flex-shrink:0}
+.hero-title{font-family:var(--f-display);font-size:clamp(40px,5.5vw,72px);font-weight:400;line-height:1.08;color:var(--cream);margin-bottom:28px;letter-spacing:-0.02em}
+.hero-title em{font-style:italic;color:var(--gold)}
+.hero-sub{font-size:16px;font-weight:300;color:rgba(240,240,235,0.55);line-height:1.8;margin-bottom:48px;max-width:400px}
+.hero-actions{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.btn-hero{font-family:var(--f-body);font-size:14px;font-weight:500;color:var(--black);background:var(--gold);padding:16px 40px;border-radius:2px;text-decoration:none;letter-spacing:0.08em;transition:all 0.25s;display:inline-block}
+.btn-hero:hover{background:var(--cream);transform:translateY(-2px)}
+.hero-price-note{font-size:13px;color:rgba(240,240,235,0.35);line-height:1.5}
+.hero-price-note strong{color:var(--cream);font-weight:500;font-size:16px}
 
-  /* NAV */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 48px;
-    background: rgba(245,243,238,0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-logo {
-    font-family: var(--font-display);
-    font-size: 13px;
-    font-weight: 400;
-    letter-spacing: 0.15em;
-    color: var(--black);
-    text-decoration: none;
-  }
-  .nav-logo span { color: var(--purple); }
-  .nav-cta {
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--white);
-    background: var(--black);
-    padding: 10px 24px;
-    border-radius: 2px;
-    text-decoration: none;
-    letter-spacing: 0.05em;
-    transition: background 0.2s;
-  }
-  .nav-cta:hover { background: var(--purple); }
+/* HERO MOCKUP */
+.hero-visual{position:relative}
+.mockup-device{background:rgba(255,255,255,0.04);border:1px solid rgba(201,185,154,0.2);border-radius:8px;padding:0;overflow:hidden}
+.mockup-bar{background:rgba(255,255,255,0.06);padding:12px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(201,185,154,0.1)}
+.mockup-dots{display:flex;gap:6px}
+.mockup-dot{width:10px;height:10px;border-radius:50%}
+.mockup-dot:nth-child(1){background:#ff5f57}
+.mockup-dot:nth-child(2){background:#febc2e}
+.mockup-dot:nth-child(3){background:#28c840}
+.mockup-url{flex:1;background:rgba(255,255,255,0.05);border-radius:4px;padding:4px 12px;font-size:11px;color:rgba(240,240,235,0.3);letter-spacing:0.05em;text-align:center}
+.mockup-body{padding:20px}
+.mockup-header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.mockup-title{font-size:10px;letter-spacing:0.15em;color:var(--gold);text-transform:uppercase}
+.mockup-week-label{font-size:10px;color:rgba(240,240,235,0.3)}
+.mockup-week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px}
+.mockup-day{background:rgba(255,255,255,0.04);border:1px solid rgba(201,185,154,0.1);border-radius:3px;padding:8px 4px;text-align:center}
+.mockup-day-n{font-size:8px;color:rgba(240,240,235,0.3);letter-spacing:0.1em;margin-bottom:6px;text-transform:uppercase}
+.ring{width:32px;height:32px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:500;border:2px solid}
+.ring-hi{border-color:#5DCAA5;color:#5DCAA5;background:rgba(93,202,165,0.08)}
+.ring-md{border-color:#EF9F27;color:#EF9F27;background:rgba(239,159,39,0.08)}
+.ring-lo{border-color:#F09595;color:#F09595;background:rgba(240,149,149,0.08)}
+.mockup-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px}
+.mockup-stat{background:rgba(255,255,255,0.04);border:1px solid rgba(201,185,154,0.1);border-radius:3px;padding:10px 8px;text-align:center}
+.mockup-stat-v{font-family:var(--f-display);font-size:18px;color:var(--cream);line-height:1}
+.mockup-stat-l{font-size:8px;color:rgba(240,240,235,0.3);text-transform:uppercase;letter-spacing:0.08em;margin-top:4px}
+.mockup-habits{background:rgba(255,255,255,0.03);border:1px solid rgba(201,185,154,0.1);border-radius:3px;padding:10px}
+.mockup-habits-title{font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
+.habit-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.habit-name{font-size:9px;color:rgba(240,240,235,0.5);flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.habit-checks{display:flex;gap:3px}
+.hc{width:10px;height:10px;border-radius:1px;border:1px solid rgba(201,185,154,0.2)}
+.hc.done{background:var(--gold);border-color:var(--gold)}
+.habit-pct{font-size:9px;color:var(--gold);min-width:28px;text-align:right}
 
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    padding: 120px 48px 80px;
-    gap: 64px;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: -200px; right: -200px;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(74,63,107,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .hero-label {
-    font-family: var(--font-body);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--purple);
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .hero-label::before {
-    content: '';
-    display: inline-block;
-    width: 24px; height: 1px;
-    background: var(--purple);
-  }
-  .hero-title {
-    font-family: var(--font-display);
-    font-size: clamp(36px, 5vw, 64px);
-    font-weight: 300;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    margin-bottom: 32px;
-  }
-  .hero-title em {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-weight: 300;
-    color: var(--purple);
-  }
-  .hero-sub {
-    font-size: 17px;
-    font-weight: 300;
-    color: #444;
-    line-height: 1.8;
-    margin-bottom: 48px;
-    max-width: 440px;
-  }
-  .hero-actions {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-  .btn-primary {
-    font-family: var(--font-body);
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--white);
-    background: var(--black);
-    padding: 16px 36px;
-    border-radius: 2px;
-    text-decoration: none;
-    letter-spacing: 0.05em;
-    transition: all 0.2s;
-    display: inline-block;
-  }
-  .btn-primary:hover { background: var(--purple); transform: translateY(-1px); }
-  .hero-price {
-    font-size: 14px;
-    color: var(--muted);
-  }
-  .hero-price strong {
-    font-size: 20px;
-    color: var(--black);
-    font-weight: 500;
-  }
-  .hero-visual {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .hero-mockup {
-    width: 100%;
-    background: var(--cream);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 32px;
-    position: relative;
-  }
-  .mockup-header {
-    font-family: var(--font-display);
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    color: var(--muted);
-    margin-bottom: 24px;
-    text-transform: uppercase;
-  }
-  .mockup-week {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-    margin-bottom: 20px;
-  }
-  .mockup-day {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    padding: 8px 6px;
-    text-align: center;
-  }
-  .mockup-day-name {
-    font-size: 8px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-  .mockup-progress {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 9px;
-    font-weight: 500;
-  }
-  .p-high { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #a5d6a7; }
-  .p-mid  { background: #fff8e1; color: #f57f17; border: 1.5px solid #ffe082; }
-  .p-low  { background: #fce4ec; color: #c62828; border: 1.5px solid #f48fb1; }
-  .mockup-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
-  }
-  .mockup-stat {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    padding: 10px;
-  }
-  .mockup-stat-val {
-    font-family: var(--font-display);
-    font-size: 18px;
-    font-weight: 300;
-    color: var(--black);
-  }
-  .mockup-stat-label {
-    font-size: 9px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
+/* SCROLL INDICATOR */
+.scroll-hint{position:absolute;bottom:40px;left:56px;display:flex;align-items:center;gap:12px;color:rgba(240,240,235,0.25);font-size:11px;letter-spacing:0.15em;text-transform:uppercase}
+.scroll-line{width:40px;height:1px;background:rgba(201,185,154,0.3);position:relative;overflow:hidden}
+.scroll-line::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:var(--gold);animation:scanline 2s infinite}
+@keyframes scanline{to{left:100%}}
 
-  /* SECTION BASE */
-  section { padding: 100px 48px; }
-  .section-label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--purple);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .section-label::before {
-    content: '';
-    display: inline-block;
-    width: 24px; height: 1px;
-    background: var(--purple);
-  }
-  .section-title {
-    font-family: var(--font-display);
-    font-size: clamp(28px, 3.5vw, 44px);
-    font-weight: 300;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-    margin-bottom: 20px;
-  }
-  .section-title em {
-    font-family: var(--font-serif);
-    font-style: italic;
-    color: var(--purple);
-  }
+/* SECTIONS */
+section{padding:100px 56px}
+.s-label{font-size:11px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--sand);margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.s-label::before{content:'';width:28px;height:1px;background:var(--sand);flex-shrink:0}
+.s-title{font-family:var(--f-display);font-size:clamp(32px,4vw,52px);font-weight:400;line-height:1.12;letter-spacing:-0.02em;margin-bottom:20px}
+.s-title em{font-style:italic;color:var(--sand)}
 
-  /* PROBLEM */
-  .problem { background: var(--black); color: var(--white); }
-  .problem .section-label { color: rgba(255,255,255,0.4); }
-  .problem .section-label::before { background: rgba(255,255,255,0.4); }
-  .problem .section-title { color: var(--white); }
-  .problem .section-title em { color: #b8a9d9; }
-  .problem-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 64px;
-    align-items: center;
-    margin-top: 64px;
-  }
-  .problem-list { list-style: none; }
-  .problem-list li {
-    display: flex;
-    gap: 20px;
-    padding: 24px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    font-size: 16px;
-    font-weight: 300;
-    color: rgba(255,255,255,0.75);
-    line-height: 1.6;
-  }
-  .problem-list li:first-child { border-top: 1px solid rgba(255,255,255,0.08); }
-  .problem-num {
-    font-family: var(--font-display);
-    font-size: 11px;
-    color: rgba(255,255,255,0.25);
-    letter-spacing: 0.1em;
-    padding-top: 3px;
-    flex-shrink: 0;
-  }
-  .problem-quote {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 4px;
-    padding: 40px;
-  }
-  .problem-quote-text {
-    font-family: var(--font-serif);
-    font-size: 28px;
-    font-style: italic;
-    font-weight: 300;
-    line-height: 1.5;
-    color: rgba(255,255,255,0.9);
-    margin-bottom: 24px;
-  }
-  .problem-quote-author {
-    font-size: 13px;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 0.1em;
-  }
+/* SCENARIO SECTION */
+.scenarios{background:var(--cream)}
+.scenario-tabs{display:flex;gap:0;border:1px solid var(--border);border-radius:4px;overflow:hidden;margin-bottom:48px;width:fit-content}
+.stab{font-size:13px;font-weight:400;color:var(--muted);background:transparent;border:none;padding:12px 28px;cursor:pointer;letter-spacing:0.05em;transition:all 0.2s;border-right:1px solid var(--border)}
+.stab:last-child{border-right:none}
+.stab.active{background:var(--black);color:var(--cream)}
+.scenario-content{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.scenario-pane{display:none}
+.scenario-pane.active{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;animation:fadein 0.4s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.scenario-text h3{font-family:var(--f-display);font-size:28px;font-weight:400;margin-bottom:16px;line-height:1.2}
+.scenario-text h3 em{font-style:italic;color:var(--sand)}
+.scenario-text p{font-size:15px;font-weight:300;color:#666;line-height:1.8;margin-bottom:24px}
+.scenario-steps{list-style:none}
+.scenario-steps li{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px;color:#555;font-weight:300}
+.scenario-steps li:first-child{border-top:1px solid var(--border)}
+.step-num{font-family:var(--f-display);font-size:12px;color:var(--muted);flex-shrink:0;padding-top:2px}
+.scenario-visual{background:var(--cream-dark);border-radius:6px;padding:28px;border:1px solid var(--border)}
+.sv-tag{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--sand);margin-bottom:16px}
+.sv-time{font-family:var(--f-display);font-size:36px;color:var(--black);margin-bottom:4px}
+.sv-day{font-size:12px;color:var(--muted);margin-bottom:20px}
+.sv-tasks{list-style:none}
+.sv-task{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(92,82,64,0.08);font-size:13px;color:#444}
+.sv-task:last-child{border-bottom:none}
+.sv-check{width:16px;height:16px;border-radius:2px;border:1.5px solid var(--gold);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sv-check.done{background:var(--gold);border-color:var(--gold)}
+.sv-check.done::after{content:'✓';font-size:9px;color:white;font-weight:700}
+.sv-mood{margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;gap:16px}
+.sv-mood-item{text-align:center}
+.sv-mood-val{font-family:var(--f-display);font-size:20px;color:var(--black)}
+.sv-mood-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em}
 
-  /* FEATURES */
-  .features-intro {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 64px;
-    align-items: end;
-    margin-bottom: 64px;
-  }
-  .features-desc {
-    font-size: 17px;
-    font-weight: 300;
-    color: #555;
-    line-height: 1.8;
-  }
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .feature-card {
-    background: var(--white);
-    padding: 36px 32px;
-    transition: background 0.2s;
-  }
-  .feature-card:hover { background: var(--cream); }
-  .feature-icon {
-    width: 40px; height: 40px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-    font-size: 18px;
-  }
-  .feature-title {
-    font-family: var(--font-display);
-    font-size: 13px;
-    font-weight: 400;
-    letter-spacing: 0.05em;
-    margin-bottom: 12px;
-  }
-  .feature-desc {
-    font-size: 14px;
-    font-weight: 300;
-    color: var(--muted);
-    line-height: 1.7;
-  }
+/* FEATURES BLOCKS */
+.features{background:var(--black);padding:100px 0}
+.features-header{padding:0 56px;margin-bottom:72px}
+.features-header .s-label{color:var(--gold)}
+.features-header .s-label::before{background:var(--gold)}
+.features-header .s-title{color:var(--cream)}
+.features-header .s-title em{color:var(--gold)}
+.feature-block{display:grid;grid-template-columns:1fr 1fr;align-items:center;border-top:1px solid rgba(201,185,154,0.1)}
+.feature-block:last-child{border-bottom:1px solid rgba(201,185,154,0.1)}
+.feature-block.reverse{direction:rtl}
+.feature-block.reverse>*{direction:ltr}
+.feature-text{padding:72px 56px}
+.feature-num{font-family:var(--f-display);font-size:80px;font-weight:400;color:rgba(201,185,154,0.08);line-height:1;margin-bottom:4px}
+.feature-title{font-family:var(--f-display);font-size:28px;font-weight:400;color:var(--cream);margin-bottom:16px;line-height:1.2}
+.feature-title em{font-style:italic;color:var(--gold)}
+.feature-desc{font-size:15px;font-weight:300;color:rgba(240,240,235,0.5);line-height:1.8;margin-bottom:24px}
+.feature-badge{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,185,154,0.3);padding:6px 14px;border-radius:2px}
+.feature-visual{background:rgba(255,255,255,0.02);border-left:1px solid rgba(201,185,154,0.1);padding:56px 40px;min-height:400px;display:flex;align-items:center;justify-content:center}
+.feature-block.reverse .feature-visual{border-left:none;border-right:1px solid rgba(201,185,154,0.1)}
 
-  /* AUTHOR */
-  .author { background: var(--cream); }
-  .author-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: center;
-    margin-top: 48px;
-  }
-  .author-photo {
-    aspect-ratio: 3/4;
-    background: var(--border);
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted);
-    font-size: 13px;
-    letter-spacing: 0.1em;
-    border: 1px solid rgba(0,0,0,0.08);
-    position: relative;
-    overflow: hidden;
-  }
-  .author-photo::after {
-    content: 'фото автора';
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .author-text {
-    font-family: var(--font-serif);
-    font-size: 22px;
-    font-style: italic;
-    font-weight: 300;
-    line-height: 1.7;
-    color: #333;
-    margin-bottom: 32px;
-  }
-  .author-name {
-    font-family: var(--font-display);
-    font-size: 12px;
-    letter-spacing: 0.15em;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
+/* MINI MOCKUPS */
+.mini-habits{width:100%;max-width:340px}
+.mh-title{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.mh-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.mh-name{font-size:12px;color:rgba(240,240,235,0.6);flex:1}
+.mh-days{display:flex;gap:4px}
+.mhd{width:14px;height:14px;border-radius:2px;border:1px solid rgba(201,185,154,0.2)}
+.mhd.on{background:var(--gold)}
+.mh-pct{font-size:11px;color:var(--gold);min-width:32px;text-align:right}
+.mh-stars{color:var(--gold);font-size:10px}
 
-  /* REVIEWS */
-  .reviews-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    margin-top: 64px;
-  }
-  .review-card {
-    background: var(--cream);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 32px;
-  }
-  .review-stars {
-    color: var(--purple);
-    font-size: 14px;
-    margin-bottom: 16px;
-    letter-spacing: 2px;
-  }
-  .review-text {
-    font-family: var(--font-serif);
-    font-size: 18px;
-    font-style: italic;
-    font-weight: 300;
-    line-height: 1.6;
-    color: #333;
-    margin-bottom: 20px;
-  }
-  .review-author {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
+.mini-journal{width:100%;max-width:340px}
+.mj-row{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(201,185,154,0.1)}
+.mj-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.mj-label{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.mj-text{font-family:var(--f-display);font-size:15px;font-style:italic;color:rgba(240,240,235,0.7);line-height:1.5}
 
-  /* PRICING */
-  .pricing { background: var(--black); color: var(--white); }
-  .pricing .section-label { color: rgba(255,255,255,0.4); }
-  .pricing .section-label::before { background: rgba(255,255,255,0.4); }
-  .pricing .section-title { color: var(--white); }
-  .pricing-card {
-    max-width: 560px;
-    margin: 64px auto 0;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 4px;
-    padding: 56px;
-    text-align: center;
-  }
-  .pricing-badge {
-    display: inline-block;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--purple);
-    background: rgba(74,63,107,0.2);
-    border: 1px solid rgba(74,63,107,0.4);
-    padding: 6px 16px;
-    border-radius: 2px;
-    margin-bottom: 32px;
-  }
-  .pricing-name {
-    font-family: var(--font-display);
-    font-size: 13px;
-    letter-spacing: 0.2em;
-    color: rgba(255,255,255,0.5);
-    margin-bottom: 16px;
-    text-transform: uppercase;
-  }
-  .pricing-price {
-    font-family: var(--font-display);
-    font-size: 72px;
-    font-weight: 300;
-    color: var(--white);
-    letter-spacing: -0.04em;
-    line-height: 1;
-    margin-bottom: 8px;
-  }
-  .pricing-price span {
-    font-size: 24px;
-    font-weight: 300;
-    vertical-align: top;
-    margin-top: 12px;
-    display: inline-block;
-  }
-  .pricing-once {
-    font-size: 13px;
-    color: rgba(255,255,255,0.35);
-    margin-bottom: 40px;
-    letter-spacing: 0.08em;
-  }
-  .pricing-features {
-    list-style: none;
-    text-align: left;
-    margin-bottom: 40px;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    padding: 24px 0;
-  }
-  .pricing-features li {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 0;
-    font-size: 15px;
-    font-weight: 300;
-    color: rgba(255,255,255,0.75);
-  }
-  .pricing-features li::before {
-    content: '✦';
-    color: var(--purple);
-    font-size: 10px;
-    flex-shrink: 0;
-  }
-  .btn-buy {
-    display: block;
-    width: 100%;
-    font-family: var(--font-body);
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--black);
-    background: var(--white);
-    padding: 18px 36px;
-    border-radius: 2px;
-    text-decoration: none;
-    letter-spacing: 0.05em;
-    transition: all 0.2s;
-    border: none;
-    cursor: pointer;
-  }
-  .btn-buy:hover { background: var(--purple); color: var(--white); }
-  .pricing-note {
-    margin-top: 20px;
-    font-size: 13px;
-    color: rgba(255,255,255,0.3);
-    line-height: 1.6;
-  }
+.mini-timemachine{width:100%;max-width:340px}
+.mtm-week{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.mtm-arrow{width:28px;height:28px;border:1px solid rgba(201,185,154,0.3);border-radius:2px;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:14px;cursor:pointer;flex-shrink:0;transition:background 0.2s}
+.mtm-arrow:hover{background:rgba(201,185,154,0.1)}
+.mtm-label{flex:1;text-align:center;font-size:12px;color:rgba(240,240,235,0.5);letter-spacing:0.08em}
+.mtm-card{background:rgba(255,255,255,0.04);border:1px solid rgba(201,185,154,0.15);border-radius:4px;padding:16px}
+.mtm-date{font-size:10px;color:var(--gold);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px}
+.mtm-entry{font-family:var(--f-display);font-size:14px;font-style:italic;color:rgba(240,240,235,0.6);line-height:1.6;margin-bottom:8px}
+.mtm-stat{font-size:11px;color:rgba(201,185,154,0.6)}
+.mtm-changing{transition:all 0.3s ease}
 
-  /* FAQ */
-  .faq-list { margin-top: 64px; max-width: 720px; margin-left: auto; margin-right: auto; }
-  .faq-item {
-    border-bottom: 1px solid var(--border);
-  }
-  .faq-q {
-    width: 100%;
-    background: none;
-    border: none;
-    text-align: left;
-    padding: 24px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: var(--font-body);
-    font-size: 16px;
-    font-weight: 400;
-    color: var(--black);
-    cursor: pointer;
-    gap: 16px;
-  }
-  .faq-q:hover { color: var(--purple); }
-  .faq-arrow {
-    font-size: 18px;
-    transition: transform 0.3s;
-    flex-shrink: 0;
-    color: var(--muted);
-  }
-  .faq-item.open .faq-arrow { transform: rotate(45deg); color: var(--purple); }
-  .faq-a {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease;
-    font-size: 15px;
-    font-weight: 300;
-    color: var(--muted);
-    line-height: 1.8;
-  }
-  .faq-a-inner { padding-bottom: 24px; }
-  .faq-item.open .faq-a { max-height: 200px; }
+.mini-themes{width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px}
+.theme-card{border-radius:4px;padding:14px 18px;border:1px solid transparent;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:14px}
+.theme-dot{width:20px;height:20px;border-radius:50%;flex-shrink:0}
+.theme-name{font-size:13px;font-weight:400}
+.theme-active{border-width:1.5px}
+.t-cream{background:rgba(240,240,235,0.06);border-color:rgba(240,240,235,0.15);color:rgba(240,240,235,0.8)}
+.t-cream .theme-dot{background:#f0f0eb}
+.t-dark{background:rgba(14,14,14,0.4);border-color:rgba(201,185,154,0.3);color:var(--gold)}
+.t-dark .theme-dot{background:#1a1a1a;border:1px solid rgba(201,185,154,0.3)}
+.t-sage{background:rgba(93,202,165,0.05);border-color:rgba(93,202,165,0.2);color:rgba(240,240,235,0.7)}
+.t-sage .theme-dot{background:#5DCAA5}
+.theme-selected-label{font-size:10px;margin-left:auto;text-transform:uppercase;letter-spacing:0.1em;opacity:0.6}
 
-  /* FOOTER */
-  footer {
-    background: var(--cream);
-    border-top: 1px solid var(--border);
-    padding: 48px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 24px;
-  }
-  .footer-logo {
-    font-family: var(--font-display);
-    font-size: 13px;
-    letter-spacing: 0.15em;
-    color: var(--black);
-  }
-  .footer-logo span { color: var(--purple); }
-  .footer-links {
-    display: flex;
-    gap: 32px;
-    list-style: none;
-  }
-  .footer-links a {
-    font-size: 13px;
-    color: var(--muted);
-    text-decoration: none;
-  }
-  .footer-links a:hover { color: var(--black); }
-  .footer-inn {
-    font-size: 12px;
-    color: var(--muted);
-  }
+/* WOW BLOCK — TIME MACHINE */
+.timemachine{background:var(--cream-dark);overflow:hidden;position:relative}
+.timemachine::before{content:'';position:absolute;top:-200px;right:-200px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(201,185,154,0.1) 0%,transparent 70%);pointer-events:none}
+.tm-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.tm-visual{position:relative}
+.tm-stack{position:relative;height:280px}
+.tm-card-back2{position:absolute;top:24px;left:12px;right:-12px;background:rgba(201,185,154,0.2);border:1px solid var(--border);border-radius:6px;height:240px}
+.tm-card-back1{position:absolute;top:12px;left:6px;right:-6px;background:rgba(201,185,154,0.35);border:1px solid var(--border);border-radius:6px;height:240px}
+.tm-card-front{position:absolute;top:0;left:0;right:-18px;background:var(--cream);border:1px solid var(--border);border-radius:6px;padding:24px;height:240px}
+.tm-card-date{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--sand);margin-bottom:12px}
+.tm-card-entry{font-family:var(--f-display);font-size:17px;font-style:italic;color:var(--black);line-height:1.5;margin-bottom:16px}
+.tm-card-stats{display:flex;gap:20px}
+.tm-card-stat{text-align:center}
+.tm-card-stat-v{font-family:var(--f-display);font-size:22px;color:var(--black)}
+.tm-card-stat-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em}
 
-  /* ANIMATIONS */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .fade-in.visible {
-    opacity: 1;
-    transform: none;
-  }
+/* AUTHOR */
+.author{background:var(--black)}
+.author-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-top:56px}
+.author-img{aspect-ratio:3/4;background:rgba(255,255,255,0.04);border:1px solid rgba(201,185,154,0.15);border-radius:4px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:32px;position:relative;overflow:hidden}
+.author-img-placeholder{font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(201,185,154,0.3)}
+.author-quote{font-family:var(--f-display);font-size:22px;font-style:italic;color:rgba(240,240,235,0.85);line-height:1.6;margin-bottom:32px;font-weight:400}
+.author-quote::before{content:'"';font-size:60px;color:rgba(201,185,154,0.2);font-family:var(--f-display);line-height:0;vertical-align:-24px;margin-right:8px}
+.author-name{font-size:12px;letter-spacing:0.15em;text-transform:uppercase;color:rgba(201,185,154,0.4)}
+.author .s-label{color:var(--gold)}
+.author .s-label::before{background:var(--gold)}
+.author .s-title{color:var(--cream)}
+.author .s-title em{color:var(--gold)}
 
-  @media (max-width: 900px) {
-    nav { padding: 16px 24px; }
-    .hero { grid-template-columns: 1fr; padding: 100px 24px 60px; gap: 48px; }
-    .hero-visual { order: -1; }
-    section { padding: 72px 24px; }
-    .problem-grid,
-    .features-intro,
-    .author-grid,
-    .reviews-grid { grid-template-columns: 1fr; gap: 40px; }
-    .features-grid { grid-template-columns: 1fr; }
-    .pricing-card { padding: 36px 24px; }
-    footer { flex-direction: column; align-items: flex-start; padding: 36px 24px; }
-  }
+/* PRICING */
+.pricing{background:var(--cream);position:relative;overflow:hidden}
+.pricing::before{content:'AXIS';font-family:var(--f-display);font-size:280px;font-weight:400;color:rgba(92,82,64,0.04);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none;letter-spacing:-0.05em}
+.pricing-inner{max-width:560px;margin:64px auto 0;position:relative}
+.pricing-card{background:var(--black);border-radius:6px;overflow:hidden}
+.pricing-top{padding:48px;border-bottom:1px solid rgba(201,185,154,0.1)}
+.pricing-badge{display:inline-block;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,185,154,0.3);padding:6px 14px;border-radius:2px;margin-bottom:28px}
+.pricing-name{font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(240,240,235,0.3);margin-bottom:12px}
+.pricing-price{font-family:var(--f-display);font-size:80px;font-weight:400;color:var(--cream);line-height:1;letter-spacing:-0.04em}
+.pricing-price sup{font-size:28px;vertical-align:top;margin-top:14px;display:inline-block;font-weight:300}
+.pricing-once{font-size:13px;color:rgba(240,240,235,0.25);margin-top:8px;letter-spacing:0.05em}
+.pricing-bottom{padding:40px 48px}
+.pricing-list{list-style:none;margin-bottom:36px}
+.pricing-list li{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(201,185,154,0.08);font-size:14px;font-weight:300;color:rgba(240,240,235,0.65)}
+.pricing-list li:first-child{border-top:1px solid rgba(201,185,154,0.08)}
+.pl-check{color:var(--gold);flex-shrink:0;margin-top:2px;font-size:12px}
+.btn-buy{display:block;width:100%;font-family:var(--f-body);font-size:15px;font-weight:500;color:var(--black);background:var(--gold);padding:18px;border-radius:2px;text-decoration:none;text-align:center;letter-spacing:0.06em;transition:all 0.25s;border:none;cursor:pointer}
+.btn-buy:hover{background:var(--cream);transform:translateY(-1px)}
+.pricing-note{margin-top:16px;font-size:12px;color:rgba(240,240,235,0.2);text-align:center;line-height:1.6}
+
+/* FAQ */
+.faq{background:var(--cream-dark)}
+.faq-wrap{max-width:680px;margin:64px auto 0}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-q{width:100%;background:none;border:none;padding:22px 0;display:flex;justify-content:space-between;align-items:center;font-family:var(--f-body);font-size:15px;font-weight:400;color:var(--black);cursor:pointer;gap:16px;text-align:left}
+.faq-q:hover{color:var(--sand)}
+.faq-icon{font-size:20px;color:var(--muted);transition:transform 0.3s;flex-shrink:0;line-height:1}
+.faq-item.open .faq-icon{transform:rotate(45deg);color:var(--sand)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.4s ease}
+.faq-a-inner{padding-bottom:20px;font-size:14px;font-weight:300;color:var(--muted);line-height:1.8}
+.faq-item.open .faq-a{max-height:200px}
+
+/* FOOTER */
+footer{background:var(--black);padding:48px 56px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:24px;border-top:1px solid rgba(201,185,154,0.1)}
+.footer-logo{font-family:var(--f-body);font-size:12px;letter-spacing:0.2em;color:rgba(240,240,235,0.5)}
+.footer-logo span{color:var(--gold)}
+.footer-links{display:flex;gap:28px;flex-wrap:wrap}
+.footer-links a{font-size:12px;color:rgba(240,240,235,0.25);text-decoration:none;letter-spacing:0.05em;transition:color 0.2s}
+.footer-links a:hover{color:rgba(240,240,235,0.6)}
+.footer-legal{font-size:11px;color:rgba(240,240,235,0.2);line-height:1.6;text-align:right}
+
+/* ANIMATIONS */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:none}
+.reveal-delay-1{transition-delay:0.1s}
+.reveal-delay-2{transition-delay:0.2s}
+.reveal-delay-3{transition-delay:0.3s}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  nav{padding:16px 24px}
+  .nav-links{display:none}
+  .hero{grid-template-columns:1fr;padding:100px 24px 60px;gap:48px}
+  .hero-visual{order:-1}
+  section{padding:72px 24px}
+  .features{padding:72px 0}
+  .features-header{padding:0 24px}
+  .feature-block{grid-template-columns:1fr}
+  .feature-block.reverse{direction:ltr}
+  .feature-text{padding:48px 24px}
+  .feature-visual{border-left:none!important;border-right:none!important;border-top:1px solid rgba(201,185,154,0.1);padding:40px 24px;min-height:auto}
+  .scenario-pane.active{grid-template-columns:1fr}
+  .tm-grid{grid-template-columns:1fr}
+  .author-grid{grid-template-columns:1fr}
+  .pricing-top,.pricing-bottom{padding:32px 28px}
+  footer{flex-direction:column;align-items:flex-start;padding:36px 24px}
+  .footer-legal{text-align:left}
+  .scenario-tabs{flex-wrap:wrap;width:100%}
+}
 </style>
 </head>
 <body>
 
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
 <!-- NAV -->
 <nav>
   <a href="#" class="nav-logo">AXIS <span>FOCUS</span></a>
-  <a href="#pricing" class="nav-cta">Получить планер</a>
+  <div class="nav-links">
+    <a href="#scenarios">Как работает</a>
+    <a href="#features">Возможности</a>
+    <a href="#pricing">Получить</a>
+    <a href="#pricing" class="nav-buy">790 ₽</a>
+  </div>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-content fade-in">
-    <p class="hero-label">Google Sheets · Один платёж · Навсегда</p>
-    <h1 class="hero-title">Порядок<br>в голове<br>начинается<br>с <em>системы</em></h1>
-    <p class="hero-sub">Недельный планер с аналитикой, трекером привычек и дневником. Работает в Google Sheets — на телефоне, планшете и компьютере.</p>
+  <div class="hero-grain"></div>
+  <div class="hero-line"></div>
+
+  <div class="reveal">
+    <p class="hero-tag">Google Sheets · один платёж · навсегда</p>
+    <h1 class="hero-title">Живи<br><em>осознанно.</em><br>Управляй<br>собой.</h1>
+    <p class="hero-sub">Не просто планер. Система которая помнит каждую твою неделю, считает прогресс и показывает куда ты движешься.</p>
     <div class="hero-actions">
-      <a href="#pricing" class="btn-primary">Получить за 790 ₽</a>
-      <div class="hero-price">один платёж —<br><strong>навсегда</strong></div>
+      <a href="#pricing" class="btn-hero">Получить за 790 ₽</a>
+      <div class="hero-price-note">один платёж —<br><strong>навсегда твой</strong></div>
     </div>
   </div>
-  <div class="hero-visual fade-in" style="transition-delay:0.15s">
-    <div class="hero-mockup">
-      <div class="mockup-header">AXIS FOCUS · Апрель · неделя 17</div>
-      <div class="mockup-week">
-        <div class="mockup-day"><div class="mockup-day-name">Пн</div><div class="mockup-progress p-high">100%</div></div>
-        <div class="mockup-day"><div class="mockup-day-name">Вт</div><div class="mockup-progress p-mid">67%</div></div>
-        <div class="mockup-day"><div class="mockup-day-name">Ср</div><div class="mockup-progress p-high">83%</div></div>
-        <div class="mockup-day"><div class="mockup-day-name">Чт</div><div class="mockup-progress p-mid">50%</div></div>
-        <div class="mockup-day"><div class="mockup-day-name">Пт</div><div class="mockup-progress p-high">75%</div></div>
-        <div class="mockup-day"><div class="mockup-day-name">Сб</div><div class="mockup-progress p-low">33%</div></div>
-        <div class="mockup-day"><div class="mockup-day-name">Вс</div><div class="mockup-progress p-mid">60%</div></div>
+
+  <div class="hero-visual reveal reveal-delay-2">
+    <div class="mockup-device">
+      <div class="mockup-bar">
+        <div class="mockup-dots">
+          <div class="mockup-dot"></div>
+          <div class="mockup-dot"></div>
+          <div class="mockup-dot"></div>
+        </div>
+        <div class="mockup-url">axisplanner.ru</div>
       </div>
-      <div class="mockup-stats">
-        <div class="mockup-stat"><div class="mockup-stat-val">73%</div><div class="mockup-stat-label">прогресс</div></div>
-        <div class="mockup-stat"><div class="mockup-stat-val">СР</div><div class="mockup-stat-label">лучший день</div></div>
-        <div class="mockup-stat"><div class="mockup-stat-val">3/3</div><div class="mockup-stat-label">цели недели</div></div>
+      <div class="mockup-body">
+        <div class="mockup-header-row">
+          <span class="mockup-title">AXIS FOCUS · неделя 17</span>
+          <span class="mockup-week-label">апрель 2025</span>
+        </div>
+        <div class="mockup-week">
+          <div class="mockup-day"><div class="mockup-day-n">Пн</div><div class="ring ring-hi">100%</div></div>
+          <div class="mockup-day"><div class="mockup-day-n">Вт</div><div class="ring ring-md">67%</div></div>
+          <div class="mockup-day"><div class="mockup-day-n">Ср</div><div class="ring ring-hi">83%</div></div>
+          <div class="mockup-day"><div class="mockup-day-n">Чт</div><div class="ring ring-md">50%</div></div>
+          <div class="mockup-day"><div class="mockup-day-n">Пт</div><div class="ring ring-hi">75%</div></div>
+          <div class="mockup-day"><div class="mockup-day-n">Сб</div><div class="ring ring-lo">33%</div></div>
+          <div class="mockup-day"><div class="mockup-day-n">Вс</div><div class="ring ring-md">60%</div></div>
+        </div>
+        <div class="mockup-stats">
+          <div class="mockup-stat"><div class="mockup-stat-v">73%</div><div class="mockup-stat-l">прогресс</div></div>
+          <div class="mockup-stat"><div class="mockup-stat-v">СР</div><div class="mockup-stat-l">топ день</div></div>
+          <div class="mockup-stat"><div class="mockup-stat-v">3/3</div><div class="mockup-stat-l">цели</div></div>
+        </div>
+        <div class="mockup-habits">
+          <div class="mockup-habits-title">Трекер привычек</div>
+          <div class="habit-row">
+            <span class="habit-name">Зарядка 15 мин</span>
+            <div class="habit-checks">
+              <div class="hc done"></div><div class="hc done"></div><div class="hc done"></div><div class="hc"></div><div class="hc done"></div><div class="hc"></div><div class="hc done"></div>
+            </div>
+            <span class="habit-pct">71%</span>
+          </div>
+          <div class="habit-row">
+            <span class="habit-name">Стакан воды утром</span>
+            <div class="habit-checks">
+              <div class="hc done"></div><div class="hc done"></div><div class="hc"></div><div class="hc done"></div><div class="hc done"></div><div class="hc done"></div><div class="hc"></div>
+            </div>
+            <span class="habit-pct">71%</span>
+          </div>
+          <div class="habit-row">
+            <span class="habit-name">Чтение 30 мин</span>
+            <div class="habit-checks">
+              <div class="hc done"></div><div class="hc"></div><div class="hc done"></div><div class="hc done"></div><div class="hc"></div><div class="hc"></div><div class="hc done"></div>
+            </div>
+            <span class="habit-pct">57%</span>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>листай</span>
   </div>
 </section>
 
-<!-- PROBLEM -->
-<section class="problem">
-  <div class="section-label">узнаёшь себя?</div>
-  <h2 class="section-title">Когда задачи<br>везде — их <em>нигде нет</em></h2>
-  <div class="problem-grid">
-    <ul class="problem-list fade-in">
-      <li><span class="problem-num">01</span>Заметки в телефоне, задачи в голове, напоминания в мессенджере — всё разрозненно</li>
-      <li><span class="problem-num">02</span>День заканчивается, а ощущение что ничего не сделал — хотя работал весь день</li>
-      <li><span class="problem-num">03</span>Привычки начинаются и бросаются. Нет системы — нет прогресса</li>
-      <li><span class="problem-num">04</span>Тревожность растёт когда не понимаешь, куда уходит время и энергия</li>
-    </ul>
-    <div class="problem-quote fade-in" style="transition-delay:0.15s">
-      <p class="problem-quote-text">«Я не искал ещё одно приложение. Я искал систему — ту, которая всегда под рукой и не исчезает после обновления телефона.»</p>
-      <p class="problem-quote-author">— автор AXIS FOCUS</p>
+<!-- SCENARIOS -->
+<section class="scenarios" id="scenarios">
+  <div class="s-label reveal">Как это работает</div>
+  <h2 class="s-title reveal">Три сценария.<br><em>Одна система.</em></h2>
+  <br>
+  <div class="scenario-tabs reveal">
+    <button class="stab active" data-tab="0">Утро</button>
+    <button class="stab" data-tab="1">Рабочая неделя</button>
+    <button class="stab" data-tab="2">Вечер</button>
+  </div>
+
+  <div class="scenario-pane active" data-pane="0">
+    <div class="scenario-text">
+      <h3>Начни день с <em>намерением</em></h3>
+      <p>5 минут утром — и ты знаешь что важно сегодня. Не листаешь ленту в поисках мотивации. Просто открываешь планер и видишь структуру.</p>
+      <ul class="scenario-steps">
+        <li><span class="step-num">01</span>Отметил сон и энергию — система видит твоё состояние</li>
+        <li><span class="step-num">02</span>Написал три цели недели — они всегда перед глазами</li>
+        <li><span class="step-num">03</span>Расставил задачи по дням — голова свободна</li>
+      </ul>
+    </div>
+    <div class="scenario-visual">
+      <div class="sv-tag">Понедельник · 07:30</div>
+      <div class="sv-time">07:30</div>
+      <div class="sv-day">начало недели</div>
+      <ul class="sv-tasks">
+        <li class="sv-task"><div class="sv-check done"></div>Выспался — 8 часов</li>
+        <li class="sv-task"><div class="sv-check done"></div>Написал цели недели</li>
+        <li class="sv-task"><div class="sv-check"></div>Разнести задачи по дням</li>
+        <li class="sv-task"><div class="sv-check"></div>Зарядка 15 минут</li>
+      </ul>
+      <div class="sv-mood">
+        <div class="sv-mood-item"><div class="sv-mood-val">8ч</div><div class="sv-mood-label">Сон</div></div>
+        <div class="sv-mood-item"><div class="sv-mood-val">⚡⚡⚡</div><div class="sv-mood-label">Энергия</div></div>
+        <div class="sv-mood-item"><div class="sv-mood-val">😊</div><div class="sv-mood-label">Настроение</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scenario-pane" data-pane="1">
+    <div class="scenario-text">
+      <h3>Неделя под <em>контролем</em></h3>
+      <p>Видишь прогресс по каждому дню в реальном времени. Аналитика сама считает — сколько сделал, какой день был продуктивнее, выполнил ли цели.</p>
+      <ul class="scenario-steps">
+        <li><span class="step-num">01</span>Отмечаешь задачи — прогресс обновляется мгновенно</li>
+        <li><span class="step-num">02</span>Видишь какой день провалился — и почему</li>
+        <li><span class="step-num">03</span>Привычки трекером — цепочка не рвётся</li>
+      </ul>
+    </div>
+    <div class="scenario-visual">
+      <div class="sv-tag">Среда · аналитика недели</div>
+      <div class="sv-time">57%</div>
+      <div class="sv-day">средний прогресс за 3 дня</div>
+      <ul class="sv-tasks">
+        <li class="sv-task"><div class="sv-check done"></div>Пн: 6 из 6 задач ✓</li>
+        <li class="sv-task"><div class="sv-check done"></div>Вт: 4 из 7 задач</li>
+        <li class="sv-task"><div class="sv-check"></div>Ср: в процессе...</li>
+      </ul>
+      <div class="sv-mood">
+        <div class="sv-mood-item"><div class="sv-mood-val">18</div><div class="sv-mood-label">Всего задач</div></div>
+        <div class="sv-mood-item"><div class="sv-mood-val">ПН</div><div class="sv-mood-label">Топ день</div></div>
+        <div class="sv-mood-item"><div class="sv-mood-val">2/3</div><div class="sv-mood-label">Цели</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scenario-pane" data-pane="2">
+    <div class="scenario-text">
+      <h3>Заверши день <em>осознанно</em></h3>
+      <p>3 минуты вечером меняют восприятие всего дня. Дневник задаёт три вопроса — и ты ложишься спать не с тревогой, а с ясностью.</p>
+      <ul class="scenario-steps">
+        <li><span class="step-num">01</span>Урок дня — что понял сегодня</li>
+        <li><span class="step-num">02</span>Благодарность — одна вещь за которую благодарен</li>
+        <li><span class="step-num">03</span>Мысли — что хочешь не забыть</li>
+      </ul>
+    </div>
+    <div class="scenario-visual">
+      <div class="sv-tag">Воскресенье · дневник</div>
+      <div class="sv-time">22:15</div>
+      <div class="sv-day">итоги недели</div>
+      <ul class="sv-tasks">
+        <li class="sv-task"><div class="sv-check done"></div>Урок: меньше обещаний — больше дел</li>
+        <li class="sv-task"><div class="sv-check done"></div>Благодарность: за тишину утром</li>
+        <li class="sv-task"><div class="sv-check done"></div>Мысль: попробовать вставать в 6:30</li>
+      </ul>
+      <div class="sv-mood">
+        <div class="sv-mood-item"><div class="sv-mood-val">73%</div><div class="sv-mood-label">Неделя</div></div>
+        <div class="sv-mood-item"><div class="sv-mood-val">3/3</div><div class="sv-mood-label">Цели</div></div>
+        <div class="sv-mood-item"><div class="sv-mood-val">😌</div><div class="sv-mood-label">Итог</div></div>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- FEATURES -->
-<section class="features">
-  <div class="features-intro">
-    <div>
-      <div class="section-label">что внутри</div>
-      <h2 class="section-title">Всё что нужно —<br>в <em>одном листе</em></h2>
-    </div>
-    <p class="features-desc">AXIS FOCUS — это не просто таблица. Это система, которая видит твою неделю целиком: что запланировал, что сделал, как себя чувствовал и куда двигаться дальше.</p>
+<section class="features" id="features">
+  <div class="features-header">
+    <div class="s-label reveal">Возможности</div>
+    <h2 class="s-title reveal">Внутри — больше<br>чем <em>ожидаешь</em></h2>
   </div>
-  <div class="features-grid fade-in">
-    <div class="feature-card">
-      <div class="feature-icon">📅</div>
-      <div class="feature-title">Недельный планер</div>
-      <p class="feature-desc">7 дней, задачи по приоритетам, заметки к каждому дню. Всё на одном экране — без переключений.</p>
+
+  <!-- FEATURE 1 — Трекер -->
+  <div class="feature-block">
+    <div class="feature-text reveal">
+      <div class="feature-num">01</div>
+      <h3 class="feature-title">Трекер привычек<br><em>по науке</em></h3>
+      <p class="feature-desc">Сетка разработана на основе книг о биохакинге и нейропластичности. Отмечаешь привычку — видишь цепочку. Рвёшь цепочку — видишь когда и почему.</p>
+      <div class="feature-badge">✦ Формирует нейронные связи</div>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">📊</div>
-      <div class="feature-title">Аналитика недели</div>
-      <p class="feature-desc">Средний прогресс, лучший день, выполнено целей. График выполнено vs запланировано — видишь динамику.</p>
+    <div class="feature-visual reveal reveal-delay-1">
+      <div class="mini-habits">
+        <div class="mh-title">Трекер продуктивности · неделя 17</div>
+        <div class="mh-row">
+          <span class="mh-name">Зарядка 15 мин</span>
+          <div class="mh-days">
+            <div class="mhd on"></div><div class="mhd on"></div><div class="mhd on"></div><div class="mhd"></div><div class="mhd on"></div><div class="mhd"></div><div class="mhd on"></div>
+          </div>
+          <span class="mh-pct">71%</span>
+        </div>
+        <div class="mh-row">
+          <span class="mh-name">Стакан воды</span>
+          <div class="mh-days">
+            <div class="mhd on"></div><div class="mhd on"></div><div class="mhd on"></div><div class="mhd on"></div><div class="mhd on"></div><div class="mhd"></div><div class="mhd"></div>
+          </div>
+          <span class="mh-pct">71%</span>
+        </div>
+        <div class="mh-row">
+          <span class="mh-name">Чтение 30 мин</span>
+          <div class="mh-days">
+            <div class="mhd on"></div><div class="mhd"></div><div class="mhd on"></div><div class="mhd on"></div><div class="mhd"></div><div class="mhd on"></div><div class="mhd on"></div>
+          </div>
+          <span class="mh-pct">71%</span>
+        </div>
+        <div class="mh-row">
+          <span class="mh-name">Контрастный душ</span>
+          <div class="mh-days">
+            <div class="mhd on"></div><div class="mhd on"></div><div class="mhd"></div><div class="mhd on"></div><div class="mhd on"></div><div class="mhd"></div><div class="mhd"></div>
+          </div>
+          <span class="mh-pct">57%</span>
+        </div>
+        <div class="mh-row" style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(201,185,154,0.15)">
+          <span class="mh-name" style="color:rgba(240,240,235,0.4)">Средний прогресс</span>
+          <span class="mh-pct" style="margin-left:auto;font-size:14px">68%</span>
+        </div>
+      </div>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">✅</div>
-      <div class="feature-title">Трекер привычек</div>
-      <p class="feature-desc">Отмечаешь привычки по дням, видишь процент выполнения. Прогресс мотивирует продолжать.</p>
+  </div>
+
+  <!-- FEATURE 2 — Дневник -->
+  <div class="feature-block reverse">
+    <div class="feature-text reveal">
+      <div class="feature-num">02</div>
+      <h3 class="feature-title">Дневник<br><em>состояний</em></h3>
+      <p class="feature-desc">Сон, энергия, настроение — каждый день. Дневник фиксирует урок, благодарность и мысли. Система анализирует данные и даёт текстовый вывод о твоём состоянии.</p>
+      <div class="feature-badge">✦ Снижает тревожность</div>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">🌙</div>
-      <div class="feature-title">Сон · Энергия · Настроение</div>
-      <p class="feature-desc">Фиксируешь состояние каждый день. Система анализирует и даёт текстовый вывод — видишь паттерны.</p>
+    <div class="feature-visual reveal reveal-delay-1">
+      <div class="mini-journal">
+        <div class="mj-row">
+          <div class="mj-label">Урок дня</div>
+          <div class="mj-text">Меньше обещаний — больше реальных дел. Фокус важнее скорости.</div>
+        </div>
+        <div class="mj-row">
+          <div class="mj-label">Благодарность</div>
+          <div class="mj-text">За тишину утром и возможность начать день без спешки.</div>
+        </div>
+        <div class="mj-row">
+          <div class="mj-label">Мысли</div>
+          <div class="mj-text">Попробовать вставать в 6:30 — посмотрим как изменится продуктивность.</div>
+        </div>
+        <div style="margin-top:16px;padding:12px;background:rgba(201,185,154,0.08);border-radius:3px;border-left:2px solid rgba(201,185,154,0.4)">
+          <div class="mj-label" style="margin-bottom:6px">Анализ недели</div>
+          <div style="font-size:12px;color:rgba(240,240,235,0.5);line-height:1.6">Показатели в норме. Энергия стабильна. Рекомендуется сохранить текущий ритм сна.</div>
+        </div>
+      </div>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">📓</div>
-      <div class="feature-title">Дневник</div>
-      <p class="feature-desc">Урок дня, благодарность, мысли. Три вопроса — три минуты. Структурируют день и снижают тревожность.</p>
+  </div>
+
+  <!-- FEATURE 3 — Темы -->
+  <div class="feature-block">
+    <div class="feature-text reveal">
+      <div class="feature-num">03</div>
+      <h3 class="feature-title">Несколько<br><em>оформлений</em></h3>
+      <p class="feature-desc">Не нужно покупать второй планер если хочешь сменить цвет. В одном продукте несколько цветовых тем — меняешь в один клик под своё настроение.</p>
+      <div class="feature-badge">✦ Только в AXIS FOCUS</div>
     </div>
-    <div class="feature-card">
-      <div class="feature-icon">🎯</div>
-      <div class="feature-title">Цели недели</div>
-      <p class="feature-desc">Три главные цели на неделю с отметкой выполнения. Фокус на важном, а не на срочном.</p>
+    <div class="feature-visual reveal reveal-delay-1">
+      <div class="mini-themes">
+        <div class="theme-card t-cream theme-active">
+          <div class="theme-dot"></div>
+          <span class="theme-name">Классика</span>
+          <span class="theme-selected-label">активна</span>
+        </div>
+        <div class="theme-card t-dark">
+          <div class="theme-dot"></div>
+          <span class="theme-name">Ночной режим</span>
+        </div>
+        <div class="theme-card t-sage">
+          <div class="theme-dot"></div>
+          <span class="theme-name">Шалфей</span>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:rgba(240,240,235,0.25);letter-spacing:0.08em">Ещё темы в разработке</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TIME MACHINE WOW BLOCK -->
+<section class="timemachine">
+  <div class="s-label reveal">Эксклюзивно</div>
+  <h2 class="s-title reveal">Машина <em>времени.</em><br>Твоя история —<br>навсегда.</h2>
+  <br>
+  <div class="tm-grid reveal">
+    <div>
+      <p style="font-size:17px;font-weight:300;color:#666;line-height:1.8;margin-bottom:32px">Смени дату в одной ячейке — и планер мгновенно пересобирается из архива. Задачи, цели, мысли, привычки той недели — всё возвращается за доли секунды.<br><br>Ни один конкурент не даёт этого.</p>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="width:40px;height:40px;border:1px solid var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">📅</div>
+          <div>
+            <div style="font-size:14px;font-weight:500;margin-bottom:4px">Автоархив каждого изменения</div>
+            <div style="font-size:13px;font-weight:300;color:var(--muted)">Каждая задача и мысль сохраняется автоматически в защищённую базу</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="width:40px;height:40px;border:1px solid var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">⚡</div>
+          <div>
+            <div style="font-size:14px;font-weight:500;margin-bottom:4px">Мгновенное восстановление</div>
+            <div style="font-size:13px;font-weight:300;color:var(--muted)">Вся неделя пересобирается за доли секунды — без ручного ввода</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:flex-start">
+          <div style="width:40px;height:40px;border:1px solid var(--border);border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">∞</div>
+          <div>
+            <div style="font-size:14px;font-weight:500;margin-bottom:4px">Бесконечная память</div>
+            <div style="font-size:13px;font-weight:300;color:var(--muted)">Вернись к любой неделе года — анализируй паттерны и рост</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tm-visual">
+      <div class="tm-stack">
+        <div class="tm-card-back2"></div>
+        <div class="tm-card-back1"></div>
+        <div class="tm-card-front">
+          <div class="tm-card-date" id="tmDate">Неделя 12 · 17–23 марта 2025</div>
+          <div class="tm-card-entry" id="tmEntry">"Понял что многозадачность — миф. Один фокус в день даёт больше чем пять размытых."</div>
+          <div class="tm-card-stats">
+            <div class="tm-card-stat"><div class="tm-card-stat-v" id="tmPct">81%</div><div class="tm-card-stat-l">прогресс</div></div>
+            <div class="tm-card-stat"><div class="tm-card-stat-v" id="tmGoals">3/3</div><div class="tm-card-stat-l">цели</div></div>
+            <div class="tm-card-stat"><div class="tm-card-stat-v" id="tmBest">ЧТ</div><div class="tm-card-stat-l">топ день</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:8px;margin-top:20px">
+        <button class="mtm-arrow" id="tmPrev">←</button>
+        <button class="mtm-arrow" id="tmNext">→</button>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- AUTHOR -->
 <section class="author">
-  <div class="section-label">об авторе</div>
-  <h2 class="section-title">Создано из <em>личной необходимости</em></h2>
+  <div class="s-label reveal">Об авторе</div>
+  <h2 class="s-title reveal">Создано из<br><em>личной необходимости</em></h2>
   <div class="author-grid">
-    <div class="author-photo fade-in"></div>
-    <div class="fade-in" style="transition-delay:0.15s">
-      <p class="author-text">«Когда есть структура снаружи — меньше шума внутри. Порядок в пространстве рождает порядок в голове. А порядок в голове меняет то, как проживаешь каждый день.<br><br>AXIS FOCUS — это система, которую я создал для себя. И которая изменила то, как я планирую, чувствую и двигаюсь вперёд.»</p>
+    <div class="author-img reveal">
+      <div class="author-img-placeholder">фото автора</div>
+    </div>
+    <div class="reveal reveal-delay-1">
+      <p class="author-quote">Я не искал ещё одно приложение. Я искал систему — ту, которая всегда под рукой, не требует подписок и не исчезает после обновления телефона. Когда есть структура снаружи — меньше шума внутри.</p>
       <p class="author-name">Автор · AXIS FOCUS</p>
-    </div>
-  </div>
-</section>
-
-<!-- REVIEWS -->
-<section class="reviews">
-  <div class="section-label">отзывы</div>
-  <h2 class="section-title">Что говорят<br>те, кто <em>уже использует</em></h2>
-  <div class="reviews-grid fade-in">
-    <div class="review-card">
-      <div class="review-stars">★★★★★</div>
-      <p class="review-text">«Наконец система, которая не требует отдельного приложения. Google Sheets всегда открыт — планер всегда под рукой.»</p>
-      <p class="review-author">Анна, маркетолог</p>
-    </div>
-    <div class="review-card">
-      <div class="review-stars">★★★★★</div>
-      <p class="review-text">«Аналитика по дням — это то чего не хватало во всех других планерах. Теперь вижу, в какие дни у меня реально получается.»</p>
-      <p class="review-author">Максим, фриланс</p>
-    </div>
-    <div class="review-card">
-      <div class="review-stars">★★★★★</div>
-      <p class="review-text">«Дневник благодарности прямо в планере — неожиданно сильная вещь. Три минуты вечером меняют восприятие всего дня.»</p>
-      <p class="review-author">Екатерина, предприниматель</p>
     </div>
   </div>
 </section>
 
 <!-- PRICING -->
 <section class="pricing" id="pricing">
-  <div class="section-label">получить доступ</div>
-  <h2 class="section-title" style="color:var(--white)">Один платёж.<br><em style="color:#b8a9d9">Навсегда ваш.</em></h2>
-  <div class="pricing-card fade-in">
-    <div class="pricing-badge">✦ AXIS FOCUS</div>
-    <div class="pricing-name">Недельный планер</div>
-    <div class="pricing-price"><span>₽</span>790</div>
-    <div class="pricing-once">разовый платёж · без подписки</div>
-    <ul class="pricing-features">
-      <li>Недельный планер с задачами и заметками</li>
-      <li>Аналитика: прогресс, лучший день, график</li>
-      <li>Трекер привычек с % выполнения</li>
-      <li>Мониторинг сна, энергии и настроения</li>
-      <li>Дневник: урок, благодарность, мысли</li>
-      <li>Работает на телефоне, планшете, ноутбуке</li>
-      <li>Мгновенная доставка на email</li>
-    </ul>
-    <a href="#" class="btn-buy">Получить AXIS FOCUS</a>
-    <p class="pricing-note">После оплаты вы получите PDF с инструкцией и ссылкой на таблицу.<br>Просто создайте копию в один клик — и начинайте.</p>
+  <div class="s-label reveal" style="justify-content:center">Получить доступ</div>
+  <h2 class="s-title reveal" style="text-align:center">Один платёж.<br><em>Навсегда твой.</em></h2>
+  <div class="pricing-inner reveal">
+    <div class="pricing-card">
+      <div class="pricing-top">
+        <div class="pricing-badge">✦ AXIS FOCUS</div>
+        <div class="pricing-name">Недельный планер · Google Sheets</div>
+        <div class="pricing-price"><sup>₽</sup>790</div>
+        <div class="pricing-once">разовый платёж · без подписки · навсегда</div>
+      </div>
+      <div class="pricing-bottom">
+        <ul class="pricing-list">
+          <li><span class="pl-check">✦</span>Недельный планер с задачами, заметками и целями</li>
+          <li><span class="pl-check">✦</span>Аналитика: прогресс, лучший день, график недели</li>
+          <li><span class="pl-check">✦</span>Трекер привычек с % выполнения (по книгам о биохакинге)</li>
+          <li><span class="pl-check">✦</span>Мониторинг сна, энергии и настроения с автоанализом</li>
+          <li><span class="pl-check">✦</span>Дневник: урок, благодарность, мысли</li>
+          <li><span class="pl-check">✦</span>Машина времени — история всех твоих недель</li>
+          <li><span class="pl-check">✦</span>Несколько цветовых тем в одном планере</li>
+          <li><span class="pl-check">✦</span>Работает на телефоне, планшете, ноутбуке</li>
+          <li><span class="pl-check">✦</span>Мгновенная доставка PDF с инструкцией на email</li>
+        </ul>
+        <a href="#" class="btn-buy">Получить AXIS FOCUS</a>
+        <p class="pricing-note">После оплаты — PDF с инструкцией и ссылкой на таблицу.<br>Один клик «Создать копию» — и планер у тебя навсегда.</p>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- FAQ -->
 <section class="faq">
-  <div class="section-label">вопросы</div>
-  <h2 class="section-title" style="text-align:center">Часто<br><em>спрашивают</em></h2>
-  <div class="faq-list">
+  <div class="s-label reveal" style="justify-content:center">Вопросы</div>
+  <h2 class="s-title reveal" style="text-align:center">Часто <em>спрашивают</em></h2>
+  <div class="faq-wrap">
     <div class="faq-item">
-      <button class="faq-q">Нужен ли Google аккаунт? <span class="faq-arrow">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">Да, нужен бесплатный аккаунт Google. Google Sheets — бесплатный сервис, он есть у большинства. Если нет — регистрация занимает 2 минуты.</div></div>
+      <button class="faq-q">Нужен ли Google аккаунт?<span class="faq-icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Да, нужен бесплатный Google аккаунт — он есть у большинства. Если нет, регистрация займёт 2 минуты. Google Sheets полностью бесплатен.</div></div>
     </div>
     <div class="faq-item">
-      <button class="faq-q">Как я получу планер после оплаты? <span class="faq-arrow">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">Сразу после оплаты на email придёт PDF с инструкцией и ссылкой. Вы нажимаете «Создать копию» — таблица появляется в вашем Google Drive. Весь процесс занимает меньше минуты.</div></div>
+      <button class="faq-q">Как получу планер после оплаты?<span class="faq-icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Сразу после оплаты на email придёт PDF с инструкцией и ссылкой. Нажимаешь «Создать копию» — таблица появляется в твоём Google Drive. Весь процесс меньше минуты.</div></div>
     </div>
     <div class="faq-item">
-      <button class="faq-q">Работает ли на телефоне? <span class="faq-arrow">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">Да. Google Sheets имеет приложение для iOS и Android. Планер оптимизирован для работы на всех устройствах — вносите задачи с телефона, анализируйте с ноутбука.</div></div>
+      <button class="faq-q">Работает ли на телефоне?<span class="faq-icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Да. Приложение Google Sheets есть на iOS и Android. Вносишь задачи с телефона, анализируешь с ноутбука — всё синхронизируется автоматически.</div></div>
     </div>
     <div class="faq-item">
-      <button class="faq-q">Это разовый платёж или подписка? <span class="faq-arrow">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">Разовый платёж навсегда. Никаких подписок, скрытых списаний или ограничений по времени. Оплатили один раз — пользуетесь всегда.</div></div>
+      <button class="faq-q">Что такое «Машина времени»?<span class="faq-icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Уникальная функция AXIS FOCUS. Каждое изменение автоматически архивируется. Меняешь дату — планер мгновенно пересобирается из архива: задачи, цели, привычки, мысли той недели. Можешь вернуться к любой неделе года.</div></div>
     </div>
     <div class="faq-item">
-      <button class="faq-q">Что если у меня возникнут вопросы? <span class="faq-arrow">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">В PDF есть подробная инструкция по началу работы. Если останутся вопросы — напишите нам, ответим в течение дня.</div></div>
+      <button class="faq-q">Это разовый платёж или подписка?<span class="faq-icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Разовый платёж навсегда. Никаких подписок, скрытых списаний или ограничений. Заплатил один раз — пользуешься всегда.</div></div>
     </div>
     <div class="faq-item">
-      <button class="faq-q">Могу ли я адаптировать планер под себя? <span class="faq-arrow">+</span></button>
-      <div class="faq-a"><div class="faq-a-inner">Да. Таблица становится вашей копией — вы можете добавлять свои задачи, менять названия привычек, настраивать под свой ритм жизни.</div></div>
+      <button class="faq-q">Могу ли я адаптировать планер под себя?<span class="faq-icon">+</span></button>
+      <div class="faq-a"><div class="faq-a-inner">Да. Таблица становится твоей копией. Меняй названия привычек, добавляй задачи, выбирай цветовую тему. Планер гибкий.</div></div>
     </div>
   </div>
 </section>
@@ -862,30 +734,83 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-logo">AXIS <span>FOCUS</span></div>
-  <ul class="footer-links">
-    <li><a href="#">Публичная оферта</a></li>
-    <li><a href="#">Политика конфиденциальности</a></li>
-    <li><a href="#">Контакты</a></li>
-  </ul>
-  <div class="footer-inn">Самозанятый · ИНН: 583524901203</div>
+  <div class="footer-links">
+    <a href="#">Публичная оферта</a>
+    <a href="#">Политика конфиденциальности</a>
+    <a href="#">Контакты</a>
+  </div>
+  <div class="footer-legal">
+    Самозанятый · ИНН: XXXXXXXXXXXX<br>
+    © 2025 AXIS FOCUS
+  </div>
 </footer>
 
 <script>
-  // FAQ accordion
-  document.querySelectorAll('.faq-q').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const item = btn.parentElement;
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-      if (!isOpen) item.classList.add('open');
-    });
+// Cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+if(cursor && ring){
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+    ring.style.left = e.clientX + 'px';
+    ring.style.top = e.clientY + 'px';
   });
+  document.querySelectorAll('a,button').forEach(el => {
+    el.addEventListener('mouseenter', () => ring.classList.add('expand'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('expand'));
+  });
+}
 
-  // Fade in on scroll
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.15 });
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+// Scroll reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold: 0.12});
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// FAQ
+document.querySelectorAll('.faq-q').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.parentElement;
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if(!isOpen) item.classList.add('open');
+  });
+});
+
+// Scenario tabs
+document.querySelectorAll('.stab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const idx = btn.dataset.tab;
+    document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.scenario-pane').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelector(`.scenario-pane[data-pane="${idx}"]`).classList.add('active');
+  });
+});
+
+// Time machine
+const weeks = [
+  {date:'Неделя 8 · 17–23 февраля 2025', entry:'"Главное открытие: тревога уходит когда есть список. Не приложение — просто список."', pct:'64%', goals:'2/3', best:'ПН'},
+  {date:'Неделя 12 · 17–23 марта 2025', entry:'"Понял что многозадачность — миф. Один фокус в день даёт больше чем пять размытых."', pct:'81%', goals:'3/3', best:'ЧТ'},
+  {date:'Неделя 17 · 21–27 апреля 2025', entry:'"Привычки формируются не силой воли. Только системой и видимым прогрессом."', pct:'73%', goals:'3/3', best:'СР'},
+  {date:'Неделя 22 · 26 мая – 1 июня 2025', entry:'"Лучшая неделя за год. Понял что порядок снаружи — это порядок внутри."', pct:'89%', goals:'3/3', best:'ВТ'},
+];
+let wi = 1;
+function updateTM(){
+  const w = weeks[wi];
+  document.getElementById('tmDate').textContent = w.date;
+  document.getElementById('tmEntry').textContent = w.entry;
+  document.getElementById('tmPct').textContent = w.pct;
+  document.getElementById('tmGoals').textContent = w.goals;
+  document.getElementById('tmBest').textContent = w.best;
+}
+document.getElementById('tmPrev').addEventListener('click', () => {
+  wi = (wi - 1 + weeks.length) % weeks.length; updateTM();
+});
+document.getElementById('tmNext').addEventListener('click', () => {
+  wi = (wi + 1) % weeks.length; updateTM();
+});
 </script>
 </body>
 </html>
