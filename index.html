@@ -40,7 +40,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 /* HERO */
 .hero{min-height:100vh;padding:140px 48px 80px;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;
+.hero::before{content:'';position:absolute;inset:0;z-index:0;
   background:radial-gradient(ellipse 70% 55% at 50% 32%,rgba(216,183,122,.16) 0%,transparent 70%);
   pointer-events:none}
 .hero-brand{font-size:12px;font-weight:500;letter-spacing:.22em;color:var(--sand-dark);
@@ -84,7 +84,7 @@ section{padding:96px 48px}
 .ssub{font-size:15px;font-weight:300;color:var(--stone);max-width:500px;line-height:1.7}
 
 /* PAIN */
-.pain{background:var(--bg-2)}
+.pain{background:radial-gradient(120% 100% at 50% -15%,rgba(216,183,122,.10) 0%,var(--bg-2) 55%)}
 .pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:52px;
   background:var(--line);border:1px solid var(--line)}
 .pain-card{background:var(--bg-2);padding:40px 32px}
@@ -160,7 +160,16 @@ section{padding:96px 48px}
 .folder-label strong{color:var(--sand)}
 
 /* TIME MACHINE */
-.tm{background:var(--bg);text-align:center}
+.tm{position:relative;background:radial-gradient(140% 100% at 50% 0%,#141019 0%,var(--bg) 60%);text-align:center;overflow:hidden}
+.tm-stars{position:absolute;inset:0;z-index:0;pointer-events:none}
+.tm-stars span{position:absolute;border-radius:50%;background:var(--sand);
+  animation:tm-twinkle linear infinite}
+@media(prefers-reduced-motion:reduce){.tm-stars span{animation:none}}
+@keyframes tm-twinkle{
+  0%,100%{opacity:var(--tw-min)}
+  50%{opacity:var(--tw-max)}
+}
+.tm > *:not(.tm-stars){position:relative;z-index:1}
 .tm-desc{font-size:15px;font-weight:300;color:var(--stone);max-width:540px;
   margin:18px auto 56px;line-height:1.7}
 .tm-pills{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
@@ -208,7 +217,7 @@ section{padding:96px 48px}
 .pc-del{margin-top:14px;font-size:11px;color:var(--stone);line-height:1.6}
 
 /* FAQ */
-.faq{background:var(--bg-2);text-align:center}
+.faq{background:radial-gradient(120% 100% at 50% 115%,rgba(216,183,122,.08) 0%,var(--bg-2) 55%);text-align:center}
 .faq-wrap{max-width:600px;margin:44px auto 0;text-align:left}
 .faq-item{border-bottom:1px solid var(--line)}
 .faq-q{width:100%;text-align:left;background:none;border:none;padding:18px 0;
@@ -351,6 +360,7 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
 </section>
 
 <section id="tm" class="tm">
+  <div class="tm-stars" id="tmStars" aria-hidden="true"></div>
   <p class="lbl">Архив</p>
   <h2 class="stitle">Машина времени.<br>Твоя история — навсегда.</h2>
   <p class="tm-desc">Смени дату — планер мгновенно пересобирается из архива. Задачи, цели, мысли, привычки той недели — всё возвращается за секунды. Ни один конкурент не даёт этого.</p>
@@ -440,6 +450,26 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
 </footer>
 
 <script>
+const starsWrap = document.getElementById('tmStars');
+if (starsWrap) {
+  const starCount = 90;
+  for (let i = 0; i < starCount; i++) {
+    const s = document.createElement('span');
+    const size = (Math.random() * 1.8 + 0.6).toFixed(2);
+    s.style.left = (Math.random() * 100).toFixed(2) + '%';
+    s.style.top = (Math.random() * 100).toFixed(2) + '%';
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    const minOp = (0.08 + Math.random() * 0.12).toFixed(2);
+    const maxOp = (minOp * 1 + 0.35 + Math.random() * 0.35).toFixed(2);
+    s.style.setProperty('--tw-min', minOp);
+    s.style.setProperty('--tw-max', maxOp);
+    s.style.animationDuration = (2.5 + Math.random() * 4).toFixed(2) + 's';
+    s.style.animationDelay = (-Math.random() * 5).toFixed(2) + 's';
+    starsWrap.appendChild(s);
+  }
+}
+
 const themeColors = [
   '#E7DAC6','#A7C4BC','#5B6B73','#8B2E3A','#C9A876','#3E6259',
   '#7A4B5C','#D9A441','#4A5B8C','#B5654A','#6E8F63','#2E2A26',
