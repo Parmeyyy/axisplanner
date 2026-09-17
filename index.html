@@ -168,8 +168,22 @@ section{padding:96px 48px}
 .tm-desc{font-size:15px;font-weight:300;color:var(--stone);max-width:540px;
   margin:18px auto 56px;line-height:1.7}
 .tm-pills{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
-.pill{display:flex;align-items:center;gap:12px;background:var(--bg-2);padding:16px 22px;border-radius:2px;border:1px solid var(--line)}
-.pill-icon{font-size:18px}
+.pill{position:relative;display:flex;align-items:center;gap:12px;padding:16px 22px;
+  border-radius:4px;border:1px solid var(--line);overflow:hidden;
+  background:radial-gradient(120% 140% at 12% -10%,rgba(216,183,122,.10) 0%,transparent 55%) var(--bg-2);
+  transition:border-color .3s}
+.pill:hover{border-color:rgba(216,183,122,.35)}
+.pill-spot{position:absolute;inset:0;opacity:0;transition:opacity .35s;pointer-events:none;
+  background:radial-gradient(140px circle at var(--mx,50%) var(--my,50%),rgba(216,183,122,.14),transparent 70%)}
+.pill:hover .pill-spot{opacity:1}
+.pill-cross{position:absolute;width:9px;height:9px;pointer-events:none;color:var(--sand-dark);opacity:.5}
+.pill-cross::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:currentColor;transform:translateX(-50%)}
+.pill-cross::after{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:currentColor;transform:translateY(-50%)}
+.pill-cross.tl{top:-4.5px;left:-4.5px}
+.pill-cross.br{bottom:-4.5px;right:-4.5px}
+.pill-icon{position:relative;z-index:1;width:20px;height:20px;flex-shrink:0;color:var(--accent)}
+.pill-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.pill-body{position:relative;z-index:1}
 .pill-t{font-size:12px;font-weight:500;color:var(--sand);margin-bottom:2px}
 .pill-s{font-size:11px;color:var(--stone)}
 
@@ -357,9 +371,24 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
   <h2 class="stitle">Машина времени.<br>Твоя история — навсегда.</h2>
   <p class="tm-desc">Смени дату — планер мгновенно пересобирается из архива. Задачи, цели, мысли, привычки той недели — всё возвращается за секунды. Ни один конкурент не даёт этого.</p>
   <div class="tm-pills">
-    <div class="pill"><div class="pill-icon">📅</div><div><div class="pill-t">Автоархив</div><div class="pill-s">Каждое изменение сохраняется</div></div></div>
-    <div class="pill"><div class="pill-icon">⚡</div><div><div class="pill-t">Мгновенное восстановление</div><div class="pill-s">Вся неделя за доли секунды</div></div></div>
-    <div class="pill"><div class="pill-icon">∞</div><div><div class="pill-t">Бесконечная память</div><div class="pill-s">Любая неделя года</div></div></div>
+    <div class="pill">
+      <span class="pill-cross tl"></span><span class="pill-cross br"></span>
+      <div class="pill-spot"></div>
+      <div class="pill-icon"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16"/><path d="M8 3v4M16 3v4"/></svg></div>
+      <div class="pill-body"><div class="pill-t">Автоархив</div><div class="pill-s">Каждое изменение сохраняется</div></div>
+    </div>
+    <div class="pill">
+      <span class="pill-cross tl"></span><span class="pill-cross br"></span>
+      <div class="pill-spot"></div>
+      <div class="pill-icon"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg></div>
+      <div class="pill-body"><div class="pill-t">Мгновенное восстановление</div><div class="pill-s">Вся неделя за доли секунды</div></div>
+    </div>
+    <div class="pill">
+      <span class="pill-cross tl"></span><span class="pill-cross br"></span>
+      <div class="pill-spot"></div>
+      <div class="pill-icon"><svg viewBox="0 0 24 24"><path d="M18.18 8c5.1 0 5.1 8 0 8-5.1 0-7.08-8-12.18-8-5.1 0-5.1 8 0 8 5.1 0 7.08-8 12.18-8Z"/></svg></div>
+      <div class="pill-body"><div class="pill-t">Бесконечная память</div><div class="pill-s">Любая неделя года</div></div>
+    </div>
   </div>
 </section>
 
@@ -444,6 +473,14 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
 </footer>
 
 <script>
+document.querySelectorAll('.pill').forEach(pill => {
+  pill.addEventListener('pointermove', e => {
+    const r = pill.getBoundingClientRect();
+    pill.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    pill.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  });
+});
+
 const starsWrap = document.getElementById('tmStars');
 if (starsWrap) {
   const starCount = 90;
