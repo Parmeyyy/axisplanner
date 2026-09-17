@@ -24,11 +24,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
   justify-content:space-between;padding:18px 48px;
   background:rgba(9,8,10,.82);backdrop-filter:blur(14px);
   border-bottom:1px solid var(--line)}
-.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--sand)}
-.nav-sym{width:28px;height:28px;position:relative}
-.nav-sym::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:1.5px;background:var(--sand);transform:translateX(-50%)}
-.nav-sym::after{content:'';position:absolute;top:50%;left:0;right:0;height:1.5px;background:var(--sand);transform:translateY(-50%)}
-.nav-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;letter-spacing:.07em}
+.nav-logo{display:flex;align-items:center;text-decoration:none;color:var(--sand)}
+.nav-logo svg{height:24px;width:auto;display:block;fill:currentColor}
 .nav-links{display:flex;align-items:center;gap:28px;list-style:none}
 .nav-links a{text-decoration:none;color:var(--stone);font-size:13px;font-weight:400;letter-spacing:.04em;transition:color .2s}
 .nav-links a:hover{color:var(--sand)}
@@ -183,9 +180,10 @@ section{padding:96px 48px}
 .fox-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;
   color:var(--sand);line-height:1.2;margin-bottom:18px}
 .fox-desc{font-size:14px;font-weight:300;color:var(--stone);line-height:1.75}
-.fox-ph{flex-shrink:0;width:180px;aspect-ratio:1/1;background:radial-gradient(circle at 35% 30%,var(--bg-3) 0%,var(--bg) 100%);
-  border-radius:10px;border:1px solid var(--line);
-  display:flex;align-items:center;justify-content:center;font-size:56px}
+.fox-ph{flex-shrink:0;width:260px;aspect-ratio:1215/1260;background:radial-gradient(circle at 35% 25%,var(--bg-3) 0%,var(--bg) 100%);
+  border-radius:16px;border:1px solid var(--line);
+  display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.fox-ph img{width:100%;height:auto;object-fit:contain;object-position:bottom;padding:14px 14px 0}
 
 /* PRICING */
 .pricing{background:var(--bg);text-align:center}
@@ -233,11 +231,8 @@ section{padding:96px 48px}
 /* FOOTER */
 footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px solid var(--line);
   display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
-.fl{display:flex;align-items:center;gap:10px}
-.fl-mark{width:24px;height:24px;position:relative}
-.fl-mark::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:1.5px;background:var(--sand-dark);transform:translateX(-50%)}
-.fl-mark::after{content:'';position:absolute;top:50%;left:0;right:0;height:1.5px;background:var(--sand-dark);transform:translateY(-50%)}
-.fl-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--sand);letter-spacing:.06em}
+.fl{display:flex;align-items:center;gap:8px;color:var(--sand)}
+.fl svg{height:20px;width:auto;display:block;fill:currentColor}
 .f-links{display:flex;gap:20px;list-style:none}
 .f-links a{color:var(--sand-dark);text-decoration:none;font-size:12px;transition:color .2s}
 .f-links a:hover{color:var(--sand)}
@@ -261,9 +256,8 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
 <body>
 
 <nav>
-  <a href="#" class="nav-logo">
-    <div class="nav-sym"></div>
-    <span class="nav-name">AXIS</span>
+  <a href="#" class="nav-logo" aria-label="AXIS FOCUS">
+    <svg viewBox="0 0 270 94" xmlns="http://www.w3.org/2000/svg"><title>AXIS</title><path fill-rule="evenodd" d="M 213.00,28.00 L 212.00,29.00 L 212.00,77.00 L 213.00,78.00 L 220.00,78.00 L 220.00,28.00 Z M 157.00,28.00 L 173.00,52.00 L 170.00,58.00 L 167.00,61.00 L 166.00,64.00 L 157.00,76.00 L 157.00,78.00 L 165.00,78.00 L 178.00,59.00 L 191.00,78.00 L 200.00,78.00 L 183.00,52.00 L 199.00,28.00 L 190.00,28.00 L 178.00,46.00 L 166.00,28.00 Z M 119.00,28.00 L 119.00,30.00 L 113.00,42.00 L 113.00,44.00 L 108.00,54.00 L 106.00,61.00 L 103.00,66.00 L 99.00,78.00 L 107.00,78.00 L 110.00,69.00 L 112.00,66.00 L 135.00,66.00 L 141.00,78.00 L 148.00,78.00 L 148.00,75.00 L 143.00,65.00 L 141.00,58.00 L 138.00,53.00 L 138.00,51.00 L 135.00,46.00 L 135.00,44.00 L 128.00,28.00 Z M 123.00,38.00 L 125.00,39.00 L 128.00,48.00 L 132.00,56.00 L 132.00,59.00 L 131.00,60.00 L 116.00,60.00 L 115.00,59.00 L 117.00,51.00 Z M 247.00,27.00 L 240.00,30.00 L 235.00,35.00 L 234.00,37.00 L 234.00,45.00 L 235.00,48.00 L 242.00,54.00 L 248.00,56.00 L 251.00,56.00 L 252.00,57.00 L 255.00,57.00 L 259.00,59.00 L 262.00,62.00 L 262.00,67.00 L 258.00,71.00 L 250.00,72.00 L 249.00,71.00 L 245.00,71.00 L 236.00,66.00 L 233.00,71.00 L 233.00,73.00 L 243.00,78.00 L 249.00,78.00 L 250.00,79.00 L 259.00,78.00 L 262.00,77.00 L 268.00,72.00 L 269.00,70.00 L 269.00,58.00 L 265.00,53.00 L 261.00,51.00 L 246.00,47.00 L 242.00,43.00 L 242.00,39.00 L 248.00,34.00 L 256.00,34.00 L 266.00,38.00 L 268.00,31.00 L 262.00,28.00 L 258.00,28.00 L 257.00,27.00 Z M 40.00,0.00 L 40.00,16.00 L 32.00,31.00 L 32.00,33.00 L 24.00,49.00 L 22.00,51.00 L 0.00,51.00 L 0.00,56.00 L 2.00,57.00 L 18.00,57.00 L 19.00,58.00 L 17.00,64.00 L 14.00,68.00 L 14.00,70.00 L 10.00,77.00 L 10.00,79.00 L 16.00,79.00 L 30.00,51.00 L 30.00,49.00 L 32.00,47.00 L 33.00,43.00 L 37.00,35.00 L 39.00,33.00 L 40.00,34.00 L 40.00,49.00 L 38.00,51.00 L 35.00,51.00 L 32.00,57.00 L 39.00,57.00 L 40.00,58.00 L 40.00,93.00 L 46.00,93.00 L 46.00,58.00 L 47.00,57.00 L 58.00,57.00 L 60.00,59.00 L 69.00,79.00 L 76.00,79.00 L 72.00,71.00 L 72.00,69.00 L 70.00,67.00 L 69.00,63.00 L 66.00,58.00 L 67.00,57.00 L 84.00,57.00 L 84.00,51.00 L 47.00,51.00 L 46.00,50.00 L 46.00,34.00 L 47.00,33.00 L 54.00,46.00 L 60.00,46.00 L 46.00,17.00 L 46.00,0.00 Z"/></svg>
   </a>
   <ul class="nav-links">
     <li><a href="#features">Возможности</a></li>
@@ -375,7 +369,7 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
     <h3 class="fox-title">Это лис AXIS FOCUS.<br>Твой напарник в системе.</h3>
     <p class="fox-desc">Умный, спокойный, немного ироничный. Он сам пользуется системой — открывает планер, смотрит задачи, выбирает главное. Не идеальный productivity-герой, а живой персонаж который тоже иногда устаёт.</p>
   </div>
-  <div class="fox-ph">🦊</div>
+  <div class="fox-ph"><img src="images/FOX.png" alt="Лис AXIS FOCUS с ноутбуком" loading="lazy"></div>
 </div>
 
 <section id="pricing" class="pricing">
@@ -438,7 +432,9 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
 </section>
 
 <footer>
-  <div class="fl"><div class="fl-mark"></div><span class="fl-name">AXIS FOCUS</span></div>
+  <div class="fl">
+    <svg viewBox="0 0 270 94" xmlns="http://www.w3.org/2000/svg"><title>AXIS</title><path fill-rule="evenodd" d="M 213.00,28.00 L 212.00,29.00 L 212.00,77.00 L 213.00,78.00 L 220.00,78.00 L 220.00,28.00 Z M 157.00,28.00 L 173.00,52.00 L 170.00,58.00 L 167.00,61.00 L 166.00,64.00 L 157.00,76.00 L 157.00,78.00 L 165.00,78.00 L 178.00,59.00 L 191.00,78.00 L 200.00,78.00 L 183.00,52.00 L 199.00,28.00 L 190.00,28.00 L 178.00,46.00 L 166.00,28.00 Z M 119.00,28.00 L 119.00,30.00 L 113.00,42.00 L 113.00,44.00 L 108.00,54.00 L 106.00,61.00 L 103.00,66.00 L 99.00,78.00 L 107.00,78.00 L 110.00,69.00 L 112.00,66.00 L 135.00,66.00 L 141.00,78.00 L 148.00,78.00 L 148.00,75.00 L 143.00,65.00 L 141.00,58.00 L 138.00,53.00 L 138.00,51.00 L 135.00,46.00 L 135.00,44.00 L 128.00,28.00 Z M 123.00,38.00 L 125.00,39.00 L 128.00,48.00 L 132.00,56.00 L 132.00,59.00 L 131.00,60.00 L 116.00,60.00 L 115.00,59.00 L 117.00,51.00 Z M 247.00,27.00 L 240.00,30.00 L 235.00,35.00 L 234.00,37.00 L 234.00,45.00 L 235.00,48.00 L 242.00,54.00 L 248.00,56.00 L 251.00,56.00 L 252.00,57.00 L 255.00,57.00 L 259.00,59.00 L 262.00,62.00 L 262.00,67.00 L 258.00,71.00 L 250.00,72.00 L 249.00,71.00 L 245.00,71.00 L 236.00,66.00 L 233.00,71.00 L 233.00,73.00 L 243.00,78.00 L 249.00,78.00 L 250.00,79.00 L 259.00,78.00 L 262.00,77.00 L 268.00,72.00 L 269.00,70.00 L 269.00,58.00 L 265.00,53.00 L 261.00,51.00 L 246.00,47.00 L 242.00,43.00 L 242.00,39.00 L 248.00,34.00 L 256.00,34.00 L 266.00,38.00 L 268.00,31.00 L 262.00,28.00 L 258.00,28.00 L 257.00,27.00 Z M 40.00,0.00 L 40.00,16.00 L 32.00,31.00 L 32.00,33.00 L 24.00,49.00 L 22.00,51.00 L 0.00,51.00 L 0.00,56.00 L 2.00,57.00 L 18.00,57.00 L 19.00,58.00 L 17.00,64.00 L 14.00,68.00 L 14.00,70.00 L 10.00,77.00 L 10.00,79.00 L 16.00,79.00 L 30.00,51.00 L 30.00,49.00 L 32.00,47.00 L 33.00,43.00 L 37.00,35.00 L 39.00,33.00 L 40.00,34.00 L 40.00,49.00 L 38.00,51.00 L 35.00,51.00 L 32.00,57.00 L 39.00,57.00 L 40.00,58.00 L 40.00,93.00 L 46.00,93.00 L 46.00,58.00 L 47.00,57.00 L 58.00,57.00 L 60.00,59.00 L 69.00,79.00 L 76.00,79.00 L 72.00,71.00 L 72.00,69.00 L 70.00,67.00 L 69.00,63.00 L 66.00,58.00 L 67.00,57.00 L 84.00,57.00 L 84.00,51.00 L 47.00,51.00 L 46.00,50.00 L 46.00,34.00 L 47.00,33.00 L 54.00,46.00 L 60.00,46.00 L 46.00,17.00 L 46.00,0.00 Z"/></svg>
+  </div>
   <ul class="f-links">
     <li><a href="#">Публичная оферта</a></li>
     <li><a href="#">Политика конфиденциальности</a></li>
@@ -469,10 +465,28 @@ if (starsWrap) {
 }
 
 const themeColors = [
-  '#E7DAC6','#A7C4BC','#5B6B73','#8B2E3A','#C9A876','#3E6259',
-  '#7A4B5C','#D9A441','#4A5B8C','#B5654A','#6E8F63','#2E2A26',
-  '#C77B5D','#5C4A72','#8FA6A0','#A43E3E','#3B4A63','#D6B98C',
-  '#6B4226','#9C7A97'
+  // от светлых к тёмным; для тёмных тем взят настоящий фон темы (bg),
+  // а не служебный цвет текста (accent), чтобы Emerald/Indigo/Mint не совпадали
+  '#aaf0d1', // Mint
+  '#2ee6d6', // Teal
+  '#d4af37', // Gold
+  '#a8ad8e', // Sand
+  '#c9784f', // Copper
+  '#e63976', // Crimson
+  '#0d8b9c', // Riviera
+  '#8a5cff', // Electric
+  '#d1401a', // Citrus
+  '#4e7a68', // SoftMint
+  '#c1440e', // Alexandrite
+  '#c2185b', // Fuchsia
+  '#0b5d43', // Malachite
+  '#7a3b12', // Cognac
+  '#0f3d6b', // Sapphire
+  '#004225', // Emerald
+  '#003366', // Indigo
+  '#33322e', // Graphite
+  '#4b0150', // Plum
+  '#2e1a47'  // Violet
 ];
 const swatchWrap = document.getElementById('folderSwatches');
 if (swatchWrap) {
