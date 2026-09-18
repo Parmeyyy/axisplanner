@@ -271,6 +271,26 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
 .f-links a:hover{color:var(--sand)}
 .f-copy{font-size:11px;color:var(--stone);justify-self:end;text-align:right}
 
+/* COOKIE BANNER */
+.cookie-banner{position:fixed;left:0;right:0;bottom:0;z-index:200;
+  background:#111;color:#F2F2F2;padding:18px 24px;
+  display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;
+  border-top:1px solid rgba(255,255,255,.1);
+  box-shadow:0 -8px 24px rgba(0,0,0,.35)}
+.cookie-banner p{font-size:13px;line-height:1.5;max-width:520px}
+.cookie-more{color:var(--sand);text-decoration:underline;text-underline-offset:2px}
+.cookie-more:hover{color:var(--accent)}
+.cookie-actions{display:flex;gap:10px;flex-shrink:0}
+.cookie-accept{background:linear-gradient(135deg,#f4ecdd 0%,var(--sand) 40%,var(--accent) 100%);
+  color:#1a1510;border:none;padding:9px 20px;border-radius:6px;
+  font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:filter .2s}
+.cookie-accept:hover{filter:brightness(1.08)}
+.cookie-close{background:transparent;color:#F2F2F2;border:1px solid rgba(255,255,255,.25);
+  padding:9px 20px;border-radius:6px;font-family:inherit;font-size:13px;font-weight:500;
+  cursor:pointer;transition:border-color .2s,color .2s}
+.cookie-close:hover{border-color:rgba(255,255,255,.5);color:#fff}
+.cookie-banner.hidden{display:none}
+
 /* RESPONSIVE */
 @media(max-width:768px){
   nav{padding:14px 20px}
@@ -498,14 +518,37 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
     <svg viewBox="0 0 270 94" xmlns="http://www.w3.org/2000/svg"><title>AXIS</title><path fill-rule="evenodd" d="M 213.00,28.00 L 212.00,29.00 L 212.00,77.00 L 213.00,78.00 L 220.00,78.00 L 220.00,28.00 Z M 157.00,28.00 L 173.00,52.00 L 170.00,58.00 L 167.00,61.00 L 166.00,64.00 L 157.00,76.00 L 157.00,78.00 L 165.00,78.00 L 178.00,59.00 L 191.00,78.00 L 200.00,78.00 L 183.00,52.00 L 199.00,28.00 L 190.00,28.00 L 178.00,46.00 L 166.00,28.00 Z M 119.00,28.00 L 119.00,30.00 L 113.00,42.00 L 113.00,44.00 L 108.00,54.00 L 106.00,61.00 L 103.00,66.00 L 99.00,78.00 L 107.00,78.00 L 110.00,69.00 L 112.00,66.00 L 135.00,66.00 L 141.00,78.00 L 148.00,78.00 L 148.00,75.00 L 143.00,65.00 L 141.00,58.00 L 138.00,53.00 L 138.00,51.00 L 135.00,46.00 L 135.00,44.00 L 128.00,28.00 Z M 123.00,38.00 L 125.00,39.00 L 128.00,48.00 L 132.00,56.00 L 132.00,59.00 L 131.00,60.00 L 116.00,60.00 L 115.00,59.00 L 117.00,51.00 Z M 247.00,27.00 L 240.00,30.00 L 235.00,35.00 L 234.00,37.00 L 234.00,45.00 L 235.00,48.00 L 242.00,54.00 L 248.00,56.00 L 251.00,56.00 L 252.00,57.00 L 255.00,57.00 L 259.00,59.00 L 262.00,62.00 L 262.00,67.00 L 258.00,71.00 L 250.00,72.00 L 249.00,71.00 L 245.00,71.00 L 236.00,66.00 L 233.00,71.00 L 233.00,73.00 L 243.00,78.00 L 249.00,78.00 L 250.00,79.00 L 259.00,78.00 L 262.00,77.00 L 268.00,72.00 L 269.00,70.00 L 269.00,58.00 L 265.00,53.00 L 261.00,51.00 L 246.00,47.00 L 242.00,43.00 L 242.00,39.00 L 248.00,34.00 L 256.00,34.00 L 266.00,38.00 L 268.00,31.00 L 262.00,28.00 L 258.00,28.00 L 257.00,27.00 Z M 40.00,0.00 L 40.00,16.00 L 32.00,31.00 L 32.00,33.00 L 24.00,49.00 L 22.00,51.00 L 0.00,51.00 L 0.00,56.00 L 2.00,57.00 L 18.00,57.00 L 19.00,58.00 L 17.00,64.00 L 14.00,68.00 L 14.00,70.00 L 10.00,77.00 L 10.00,79.00 L 16.00,79.00 L 30.00,51.00 L 30.00,49.00 L 32.00,47.00 L 33.00,43.00 L 37.00,35.00 L 39.00,33.00 L 40.00,34.00 L 40.00,49.00 L 38.00,51.00 L 35.00,51.00 L 32.00,57.00 L 39.00,57.00 L 40.00,58.00 L 40.00,93.00 L 46.00,93.00 L 46.00,58.00 L 47.00,57.00 L 58.00,57.00 L 60.00,59.00 L 69.00,79.00 L 76.00,79.00 L 72.00,71.00 L 72.00,69.00 L 70.00,67.00 L 69.00,63.00 L 66.00,58.00 L 67.00,57.00 L 84.00,57.00 L 84.00,51.00 L 47.00,51.00 L 46.00,50.00 L 46.00,34.00 L 47.00,33.00 L 54.00,46.00 L 60.00,46.00 L 46.00,17.00 L 46.00,0.00 Z"/></svg>
   </div>
   <ul class="f-links">
-    <li><a href="#">Публичная оферта</a></li>
-    <li><a href="#">Политика конфиденциальности</a></li>
-    <li><a href="#">Контакты</a></li>
+    <li><a href="offer.html">Публичная оферта</a></li>
+    <li><a href="privacy.html">Политика конфиденциальности</a></li>
+    <li><a href="mailto:axisplanner@mail.ru">Контакты</a></li>
   </ul>
-  <p class="f-copy">Самозанятый · ИНН: XXXXXXXXXXXX<br>© 2026 AXIS FOCUS</p>
+  <p class="f-copy">Самозанятый · ИНН: 583524901203<br>© 2026 AXIS FOCUS</p>
 </footer>
 
+<div class="cookie-banner hidden" id="cookieBanner">
+  <p>Мы используем cookies для корректной работы сайта. <a href="privacy.html" class="cookie-more">Подробнее</a></p>
+  <div class="cookie-actions">
+    <button class="cookie-accept" id="cookieAccept">Принять</button>
+    <button class="cookie-close" id="cookieClose">Закрыть</button>
+  </div>
+</div>
+
 <script>
+(function () {
+  const banner = document.getElementById('cookieBanner');
+  if (!banner) return;
+  const STORAGE_KEY = 'cookieConsent';
+  if (!localStorage.getItem(STORAGE_KEY)) {
+    banner.classList.remove('hidden');
+  }
+  function dismiss() {
+    localStorage.setItem(STORAGE_KEY, 'true');
+    banner.classList.add('hidden');
+  }
+  document.getElementById('cookieAccept').addEventListener('click', dismiss);
+  document.getElementById('cookieClose').addEventListener('click', dismiss);
+})();
+
 document.querySelectorAll('.fx-card').forEach(card => {
   card.addEventListener('pointermove', e => {
     const r = card.getBoundingClientRect();
