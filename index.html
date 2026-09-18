@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AXIS FOCUS — Живи осознанно</title>
 <meta name="description" content="Не просто планер. Система, которая помнит каждую твою неделю, считает прогресс и показывает, куда ты движешься.">
+<link rel="preconnect" href="https://script.google.com">
+<link rel="preconnect" href="https://yoomoney.ru">
 <link rel="preload" href="fonts/geologica-normal-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/geologica-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -538,25 +540,39 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
   const buyBtn = document.getElementById('buyBtn');
   if (!buyBtn) return;
   const PAYMENT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzrBUmyDEUjOfl2abk5XcWjKT0uFqcSAPlaQOiF9XvlFEaaTE2e7LDOxn7hP4c0ruO3XA/exec';
+  const SITE_TOKEN = 'Kt14omwbBiUBWk3O-O9_H8BLKL_u3Nt2';
   const originalText = buyBtn.textContent;
+  let isLoading = false;
 
   buyBtn.addEventListener('click', function (e) {
     e.preventDefault();
+    if (isLoading) return;
+    isLoading = true;
     buyBtn.textContent = 'Секунду…';
-    fetch(PAYMENT_ENDPOINT)
+    buyBtn.style.pointerEvents = 'none';
+    buyBtn.style.opacity = '0.7';
+
+    fetch(PAYMENT_ENDPOINT + '?token=' + encodeURIComponent(SITE_TOKEN))
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (data.ok && data.url) {
           window.location.href = data.url;
         } else {
           alert('Не удалось создать платёж. Попробуйте ещё раз или напишите на axisplanner@mail.ru');
-          buyBtn.textContent = originalText;
+          resetButton();
         }
       })
       .catch(function () {
         alert('Ошибка соединения. Попробуйте ещё раз.');
-        buyBtn.textContent = originalText;
+        resetButton();
       });
+
+    function resetButton() {
+      isLoading = false;
+      buyBtn.textContent = originalText;
+      buyBtn.style.pointerEvents = '';
+      buyBtn.style.opacity = '';
+    }
   });
 })();
 
