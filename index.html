@@ -476,7 +476,7 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
         <li><span class="ck">✦</span> 20 цветовых тем в одном планере</li>
         <li><span class="ck">✦</span> Мгновенная доставка PDF на email</li>
       </ul>
-      <a href="https://script.google.com/macros/s/AKfycbzrBUmyDEUjOfl2abk5XcWjKT0uFqcSAPlaQOiF9XvlFEaaTE2e7LDOxn7hP4c0ruO3XA/exec" class="pc-btn">Получить AXIS FOCUS</a>
+      <a href="#" class="pc-btn" id="buyBtn">Получить AXIS FOCUS</a>
       <p class="pc-del">После оплаты — PDF с инструкцией и ссылкой на планер.<br>Один клик «Создать копию» — и планер твой навсегда.</p>
     </div>
   </div>
@@ -534,6 +534,32 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
 </div>
 
 <script>
+(function () {
+  const buyBtn = document.getElementById('buyBtn');
+  if (!buyBtn) return;
+  const PAYMENT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzrBUmyDEUjOfl2abk5XcWjKT0uFqcSAPlaQOiF9XvlFEaaTE2e7LDOxn7hP4c0ruO3XA/exec';
+  const originalText = buyBtn.textContent;
+
+  buyBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    buyBtn.textContent = 'Секунду…';
+    fetch(PAYMENT_ENDPOINT)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.ok && data.url) {
+          window.location.href = data.url;
+        } else {
+          alert('Не удалось создать платёж. Попробуйте ещё раз или напишите на axisplanner@mail.ru');
+          buyBtn.textContent = originalText;
+        }
+      })
+      .catch(function () {
+        alert('Ошибка соединения. Попробуйте ещё раз.');
+        buyBtn.textContent = originalText;
+      });
+  });
+})();
+
 (function () {
   const banner = document.getElementById('cookieBanner');
   if (!banner) return;
