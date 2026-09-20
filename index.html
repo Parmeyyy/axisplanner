@@ -244,6 +244,12 @@ section{padding:96px 48px}
   color:#1a1510;padding:17px;border-radius:10px;border:1px solid rgba(255,255,255,.4);
   font-size:14px;font-weight:700;text-decoration:none;letter-spacing:.06em;transition:all .25s;
   box-shadow:0 8px 24px rgba(216,183,122,.28),inset 0 1px 0 rgba(255,255,255,.5)}
+.pc-email{display:block;width:100%;margin:0 0 12px;padding:14px 16px;background:rgba(255,255,255,.04);border:1px solid rgba(216,183,122,.3);border-radius:12px;color:var(--sand);font:inherit;font-size:15px;text-align:center;outline:none;transition:border-color .2s}
+.pc-email:focus{border-color:var(--accent)}
+.pc-email.err{border-color:#d9776b}
+.pc-email::placeholder{color:rgba(231,218,198,.45)}
+.pc-agree{font-size:11px;line-height:1.5;color:rgba(231,218,198,.5);margin:12px 0 0}
+.pc-agree a{color:inherit;text-decoration:underline}
 .pc-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(216,183,122,.4),inset 0 1px 0 rgba(255,255,255,.6)}
 .pc-del{margin-top:14px;font-size:11px;color:var(--stone);line-height:1.6}
 
@@ -478,7 +484,9 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
         <li><span class="ck">✦</span> 20 цветовых тем в одном планере</li>
         <li><span class="ck">✦</span> Мгновенная доставка PDF на email</li>
       </ul>
+      <input type="email" class="pc-email" id="buyEmail" placeholder="Ваш email — сюда придёт планер" autocomplete="email" inputmode="email" aria-label="Email для получения планера">
       <a href="#" class="pc-btn" id="buyBtn">Получить AXIS FOCUS</a>
+      <p class="pc-agree">Нажимая кнопку, вы принимаете <a href="offer.html" target="_blank" rel="noopener">оферту</a> и <a href="privacy.html" target="_blank" rel="noopener">политику конфиденциальности</a>.</p>
       <p class="pc-del">После оплаты — PDF с инструкцией и ссылкой на планер.<br>Один клик «Создать копию» — и планер твой навсегда.</p>
     </div>
   </div>
@@ -544,15 +552,25 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
   const originalText = buyBtn.textContent;
   let isLoading = false;
 
+  const emailInput = document.getElementById('buyEmail');
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  if (emailInput) emailInput.addEventListener('input', function () { emailInput.classList.remove('err'); });
+
   buyBtn.addEventListener('click', function (e) {
     e.preventDefault();
     if (isLoading) return;
+    const email = emailInput ? emailInput.value.trim() : '';
+    if (!EMAIL_RE.test(email)) {
+      emailInput.classList.add('err');
+      emailInput.focus();
+      return;
+    }
     isLoading = true;
     buyBtn.textContent = 'Секунду…';
     buyBtn.style.pointerEvents = 'none';
     buyBtn.style.opacity = '0.7';
 
-    fetch(PAYMENT_ENDPOINT + '?token=' + encodeURIComponent(SITE_TOKEN))
+    fetch(PAYMENT_ENDPOINT + '?token=' + encodeURIComponent(SITE_TOKEN) + '&email=' + encodeURIComponent(email))
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (data.ok && data.url) {
