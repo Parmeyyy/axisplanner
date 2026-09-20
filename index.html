@@ -248,6 +248,10 @@ section{padding:96px 48px}
 .pc-email:focus{border-color:var(--accent)}
 .pc-email.err{border-color:#d9776b}
 .pc-email::placeholder{color:rgba(231,218,198,.45)}
+.pc-check{display:flex;align-items:flex-start;gap:10px;margin:0 0 12px;font-size:13px;line-height:1.45;color:rgba(231,218,198,.75);cursor:pointer;text-align:left}
+.pc-check input{margin-top:2px;width:16px;height:16px;flex:none;accent-color:var(--accent);cursor:pointer}
+.pc-check a{color:inherit;text-decoration:underline}
+.pc-check.err{color:#d9776b}
 .pc-agree{font-size:11px;line-height:1.5;color:rgba(231,218,198,.5);margin:12px 0 0}
 .pc-agree a{color:inherit;text-decoration:underline}
 .pc-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(216,183,122,.4),inset 0 1px 0 rgba(255,255,255,.6)}
@@ -486,7 +490,8 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
       </ul>
       <input type="email" class="pc-email" id="buyEmail" placeholder="Ваш email — сюда придёт планер" autocomplete="email" inputmode="email" aria-label="Email для получения планера">
       <a href="#" class="pc-btn" id="buyBtn">Получить AXIS FOCUS</a>
-      <p class="pc-agree">Нажимая кнопку, вы принимаете <a href="offer.html" target="_blank" rel="noopener">оферту</a> и <a href="privacy.html" target="_blank" rel="noopener">политику конфиденциальности</a>.</p>
+      <label class="pc-check"><input type="checkbox" id="buyOffer"><span>Принимаю условия <a href="offer.html" target="_blank" rel="noopener">публичной оферты</a></span></label>
+      <p class="pc-agree">Email используется только для доставки заказа. Подробнее — в <a href="privacy.html" target="_blank" rel="noopener">политике конфиденциальности</a>.</p>
       <p class="pc-del">После оплаты — PDF с инструкцией и ссылкой на планер.<br>Один клик «Создать копию» — и планер твой навсегда.<br>Письмо не пришло за 5 минут? Загляни в «Промоакции» и «Спам».</p>
     </div>
   </div>
@@ -554,6 +559,8 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
 
   const emailInput = document.getElementById('buyEmail');
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const offerBoxEl = document.getElementById('buyOffer');
+  if (offerBoxEl) offerBoxEl.addEventListener('change', function () { offerBoxEl.parentNode.classList.remove('err'); });
   if (emailInput) emailInput.addEventListener('input', function () { emailInput.classList.remove('err'); });
 
   buyBtn.addEventListener('click', function (e) {
@@ -563,6 +570,11 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
     if (!EMAIL_RE.test(email)) {
       emailInput.classList.add('err');
       emailInput.focus();
+      return;
+    }
+    const offerBox = document.getElementById('buyOffer');
+    if (offerBox && !offerBox.checked) {
+      offerBox.parentNode.classList.add('err');
       return;
     }
     isLoading = true;
