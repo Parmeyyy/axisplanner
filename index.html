@@ -303,6 +303,22 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
 .cookie-close:hover{border-color:rgba(255,255,255,.5);color:#fff}
 .cookie-banner.hidden{display:none}
 
+/* CONFIRM MODAL */
+.confirm-overlay{position:fixed;inset:0;z-index:300;background:rgba(9,8,10,.72);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;padding:24px}
+.confirm-box{background:var(--bg-2);border:1px solid var(--line);border-radius:14px;
+  max-width:360px;width:100%;padding:28px 26px;text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.confirm-msg{font-size:14px;color:var(--text);line-height:1.6;margin-bottom:22px;word-break:break-word}
+.confirm-actions{display:flex;flex-direction:column;gap:10px}
+.confirm-ok{background:linear-gradient(135deg,#f4ecdd 0%,var(--sand) 35%,var(--accent) 75%,#c9a05e 100%);
+  color:#1a1510;border:1px solid rgba(255,255,255,.4);border-radius:10px;padding:13px;
+  font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:transform .2s}
+.confirm-ok:hover{transform:translateY(-1px)}
+.confirm-cancel{background:transparent;border:none;color:var(--stone);font-family:inherit;font-size:12px;
+  cursor:pointer;padding:6px;transition:color .2s}
+.confirm-cancel:hover{color:var(--sand)}
+
 /* RESPONSIVE */
 @media(max-width:768px){
   nav{padding:14px 20px}
@@ -492,7 +508,7 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
       <a href="#" class="pc-btn" id="buyBtn">Получить AXIS FOCUS</a>
       <label class="pc-check"><input type="checkbox" id="buyOffer"><span>Принимаю условия <a href="offer.html" target="_blank" rel="noopener">публичной оферты</a></span></label>
       <p class="pc-agree">Email используется только для доставки заказа. Подробнее — в <a href="privacy.html" target="_blank" rel="noopener">политике конфиденциальности</a>.</p>
-      <p class="pc-del">После оплаты — PDF с инструкцией и ссылкой на планер.<br>Один клик «Создать копию» — и планер твой навсегда.<br>Письмо не пришло за 5 минут? Загляни в «Промоакции» и «Спам».</p>
+      <p class="pc-del">После оплаты — PDF с инструкцией и ссылкой на планер.<br>Один клик «Создать копию» — и планер твой навсегда.<br>Письмо не пришло за 5 минут? Загляни в «Промоакции» и «Спам». Не нашёл — напиши на axisplanner@mail.ru, вышлем вручную.</p>
     </div>
   </div>
 </section>
@@ -563,6 +579,43 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
   if (offerBoxEl) offerBoxEl.addEventListener('change', function () { offerBoxEl.parentNode.classList.remove('err'); });
   if (emailInput) emailInput.addEventListener('input', function () { emailInput.classList.remove('err'); });
 
+  function showConfirm(message) {
+    return new Promise(function (resolve) {
+      const overlay = document.createElement('div');
+      overlay.className = 'confirm-overlay';
+      overlay.innerHTML =
+        '<div class="confirm-box" role="dialog" aria-modal="true">' +
+          '<p class="confirm-msg"></p>' +
+          '<div class="confirm-actions">' +
+            '<button type="button" class="confirm-ok">Всё верно, оплатить</button>' +
+            '<button type="button" class="confirm-cancel">Изменить email</button>' +
+          '</div>' +
+        '</div>';
+      overlay.querySelector('.confirm-msg').textContent = message;
+      document.body.appendChild(overlay);
+
+      const okBtn = overlay.querySelector('.confirm-ok');
+      const cancelBtn = overlay.querySelector('.confirm-cancel');
+
+      function close(result) {
+        document.removeEventListener('keydown', onKey);
+        overlay.remove();
+        resolve(result);
+      }
+      function onKey(ev) {
+        if (ev.key === 'Escape') close(false);
+        if (ev.key === 'Enter') close(true);
+      }
+      overlay.addEventListener('click', function (ev) {
+        if (ev.target === overlay) close(false);
+      });
+      okBtn.addEventListener('click', function () { close(true); });
+      cancelBtn.addEventListener('click', function () { close(false); });
+      document.addEventListener('keydown', onKey);
+      okBtn.focus();
+    });
+  }
+
   buyBtn.addEventListener('click', function (e) {
     e.preventDefault();
     if (isLoading) return;
@@ -577,25 +630,29 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
       offerBox.parentNode.classList.add('err');
       return;
     }
-    isLoading = true;
-    buyBtn.textContent = 'Секунду…';
-    buyBtn.style.pointerEvents = 'none';
-    buyBtn.style.opacity = '0.7';
+    showConfirm('Отправим планер на ' + email + '. Всё верно?').then(function (confirmed) {
+      if (!confirmed) return;
 
-    fetch(PAYMENT_ENDPOINT + '?token=' + encodeURIComponent(SITE_TOKEN) + '&email=' + encodeURIComponent(email))
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        if (data.ok && data.url) {
-          window.location.href = data.url;
-        } else {
-          alert('Не удалось создать платёж. Попробуйте ещё раз или напишите на axisplanner@mail.ru');
+      isLoading = true;
+      buyBtn.textContent = 'Секунду…';
+      buyBtn.style.pointerEvents = 'none';
+      buyBtn.style.opacity = '0.7';
+
+      fetch(PAYMENT_ENDPOINT + '?token=' + encodeURIComponent(SITE_TOKEN) + '&email=' + encodeURIComponent(email))
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.ok && data.url) {
+            window.location.href = data.url;
+          } else {
+            alert('Не удалось создать платёж. Попробуйте ещё раз или напишите на axisplanner@mail.ru');
+            resetButton();
+          }
+        })
+        .catch(function () {
+          alert('Ошибка соединения. Попробуйте ещё раз.');
           resetButton();
-        }
-      })
-      .catch(function () {
-        alert('Ошибка соединения. Попробуйте ещё раз.');
-        resetButton();
-      });
+        });
+    });
 
     function resetButton() {
       isLoading = false;
