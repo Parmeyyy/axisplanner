@@ -572,6 +572,7 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
   const SITE_TOKEN = 'Kt14omwbBiUBWk3O-O9_H8BLKL_u3Nt2';
   const originalText = buyBtn.textContent;
   let isLoading = false;
+  let slowNoticeTimer = null;
 
   const emailInput = document.getElementById('buyEmail');
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -637,6 +638,9 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
       buyBtn.textContent = 'Секунду…';
       buyBtn.style.pointerEvents = 'none';
       buyBtn.style.opacity = '0.7';
+      slowNoticeTimer = setTimeout(function () {
+        buyBtn.textContent = 'Открываем оплату… иногда до 20 секунд';
+      }, 4000);
 
       fetch(PAYMENT_ENDPOINT + '?token=' + encodeURIComponent(SITE_TOKEN) + '&email=' + encodeURIComponent(email))
         .then(function (r) { return r.json(); })
@@ -655,6 +659,7 @@ footer{background:var(--bg);color:var(--sand);padding:40px 48px;border-top:1px s
     });
 
     function resetButton() {
+      clearTimeout(slowNoticeTimer);
       isLoading = false;
       buyBtn.textContent = originalText;
       buyBtn.style.pointerEvents = '';
